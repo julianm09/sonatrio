@@ -23,7 +23,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleLoginLink = () => {
+    const handleLoginSwitch = () => {
         setLogin(!login);
     };
 
@@ -90,7 +90,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
 
                         <div
                             className={styles["login-link"]}
-                            onClick={handleLoginLink}
+                            onClick={handleLoginSwitch}
                         >
                             Create an account
                         </div>
@@ -151,7 +151,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
 
                     <div
                         className={styles["login-link"]}
-                        onClick={handleLoginLink}
+                        onClick={handleLoginSwitch}
                     >
                         Have an account? Login
                     </div>
