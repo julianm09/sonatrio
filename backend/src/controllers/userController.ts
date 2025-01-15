@@ -98,23 +98,3 @@ export const loginUser: (req: Request, res: Response) => Promise<void> = async (
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
-export const getAllUsers: (
-    req: Request,
-    res: Response
-) => Promise<void> = async (req, res) => {
-    try {
-        await pool.query(`
-            SELECT * FROM users;
-        `);
-        res.status(200).send({ message: "Get Users" });
-    } catch (err) {
-        if (err instanceof Error) {
-            console.error("Error creating table:", err.message);
-            res.status(500).send({ error: err.message });
-        } else {
-            console.error("Unknown error:", err);
-            res.status(500).send({ error: "An unexpected error occurred" });
-        }
-    }
-};

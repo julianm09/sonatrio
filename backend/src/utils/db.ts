@@ -1,5 +1,4 @@
 import { Pool } from "pg";
-import fs from "fs"
 
 const pool = new Pool({
     user: process.env.PG_USER,
@@ -11,7 +10,6 @@ const pool = new Pool({
         rejectUnauthorized: false,
     },
 });
-
 
 pool.on('connect', () => {
     console.log("Connected to the database");

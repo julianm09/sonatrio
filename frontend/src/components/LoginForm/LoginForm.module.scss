@@ -1,0 +1,22 @@
+.container {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 40px;
+}
+
+.form {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 20px;
+}
+
+.input-container {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 5px;
+}
+
+.login-link {
+    cursor: pointer;
+    text-align: center;
+}
