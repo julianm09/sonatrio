@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./LoginForm.module.scss";
 import { loginUser, registerUser } from "@/utils/api/userApi";
+import axios from "axios";
 
 interface LoginData {
     name: string;
@@ -24,19 +25,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
     };
 
     const handleLoginSwitch = () => {
-        setLogin(!login);
-    };
+        setLogin(!login)
+        setError(null)
+    }
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             const result = await loginUser(formData);
             console.log("Login successful:", result);
+            setError(null);
         } catch (err) {
-            if (err instanceof Error) {
+            if (axios.isAxiosError(err)) {
+                // Handle Axios error with a response
+                const errorMessage =
+                    err.response?.data?.message ||
+                    "An unexpected error occurred";
+                setError(errorMessage);
+                console.log("Axios Error:", errorMessage);
+            } else if (err instanceof Error) {
+                // Handle generic errors
                 setError(err.message);
+                console.log("Generic Error:", err.message);
             } else {
                 setError("An unexpected error occurred");
+                console.log("Unknown Error:", err);
             }
         }
     };
@@ -46,11 +59,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
         try {
             const result = await registerUser(formData);
             console.log("User created:", result);
+            setError(null);
         } catch (err) {
-            if (err instanceof Error) {
+            if (axios.isAxiosError(err)) {
+                // Handle Axios error with a response
+                const errorMessage =
+                    err.response?.data?.message ||
+                    "An unexpected error occurred";
+                setError(errorMessage);
+                console.log("Axios Error:", errorMessage);
+            } else if (err instanceof Error) {
+                // Handle generic errors
                 setError(err.message);
+                console.log("Generic Error:", err.message);
             } else {
                 setError("An unexpected error occurred");
+                console.log("Unknown Error:", err);
             }
         }
     };
@@ -86,14 +110,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
                             />
                         </div>
 
-                        <button type="submit">Log In</button>
-
-                        <div
-                            className={styles["login-link"]}
-                            onClick={handleLoginSwitch}
+                        <button
+                            className={styles["login-button"]}
+                            type="submit"
                         >
-                            Create an account
-                        </div>
+                            Log In
+                        </button>
                     </form>
                 </>
             ) : (
@@ -147,17 +169,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
                             }}
                         />
                     </div>
-                    <button type="submit">Sign Up</button>
-
-                    <div
-                        className={styles["login-link"]}
-                        onClick={handleLoginSwitch}
-                    >
-                        Have an account? Login
-                    </div>
+                    <button className={styles["login-button"]} type="submit">
+                        Sign Up
+                    </button>
                 </form>
             )}
-            {error}
+            <div
+                className={styles["login-switch"]}
+                onClick={handleLoginSwitch}
+            >
+                {login ? "Need an account? Sign up" : "Have an account? Login"}
+            </div>
+            <div className={styles["error-message"]}>{error}</div>
         </div>
     );
 };

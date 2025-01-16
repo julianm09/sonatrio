@@ -1,213 +1,152 @@
 import { Request, Response } from "express";
 import pool from "../utils/db";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
+import {
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+    updateProfile,
+} from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { auth } from "../firebase";
 
-const generateVerificationToken = (userId: number): string | null => {
-    try {
-        return jwt.sign(
-            { userId },
-            process.env.VERIFICATION_TOKEN_SECRET as string, // Secret key
-            { expiresIn: "1h" } // Token valid for 1 hour
-        );
-    } catch (error) {
-        console.error("Error generating verification token:", error);
-        return null; // Return null if token generation fails
-    }
-};
-
-const sendVerificationEmail = async (
-    email: string,
-    token: string
-): Promise<boolean> => {
-    try {
-        const transporter = nodemailer.createTransport({
-            service: "gmail", // Use your email provider
-            auth: {
-                user: process.env.EMAIL_USER, // Your email address
-                pass: process.env.EMAIL_PASS, // Your email password or app password
-            },
-        });
-
-        const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Verify Your Email Address",
-            html: `<p>Click the link below to verify your email address:</p>
-                <a href="${verificationLink}">${verificationLink}</a>`,
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log("Verification email sent to:", email);
-        return true; // Indicate success
-    } catch (error) {
-        const err = error as Error; // Type assertion
-        console.error("Error sending verification email:", err.message);
-        return false;
-    }
-};
-
-export const verifyEmail = async (
-    req: Request,
-    res: Response
-): Promise<void> => {
-    const { token } = req.body;
-
-    if (!token) {
-        res.status(400).json({ error: "Verification token is required" });
-        return;
-    }
-
-    try {
-        const decoded = jwt.verify(
-            token,
-            process.env.VERIFICATION_TOKEN_SECRET as string
-        ) as jwt.JwtPayload;
-
-        const userId = decoded.userId;
-
-        const query = `
-            UPDATE users SET verified = TRUE WHERE id = $1 RETURNING id;
-        `;
-        const result = await pool.query(query, [userId]);
-
-        if (result.rows.length === 0) {
-            res.status(400).json({ error: "Invalid token or user not found" });
-            return;
-        }
-
-        res.status(200).json({ message: "Email verified successfully" });
-    } catch (error) {
-        console.error("Error verifying email:", error);
-        res.status(403).json({ error: "Invalid or expired token" });
-    }
-};
-
+/**
+ * Create a new user with Firebase Authentication and store user data in PostgreSQL.
+ * @param req - Express request object
+ * @param res - Express response object
+ */
 export const createUser = async (
     req: Request,
     res: Response
 ): Promise<void> => {
     const { name, email, password } = req.body;
 
-    if (!name || !email || !password) {
-        res.status(400).json({ error: "All fields are required" });
+    // Validate input
+    if (!email || !password) {
+        res.status(400).json({ message: "Email and password are required." });
         return;
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-
     try {
+        // Create user with Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+        const user = userCredential.user;
+
+        // Update Firebase user's profile with display name
+        if (name) {
+            await updateProfile(user, { displayName: name });
+        }
+
+        // Send email verification
+        await sendEmailVerification(user);
+        console.log("Verification email sent.");
+
+        // Save user information in PostgreSQL
+        const firebaseUID = user.uid;
         const query = `
-            INSERT INTO users (name, email, password_hash, verified)
-            VALUES ($1, $2, $3, $4) RETURNING id;
+            INSERT INTO users (firebase_uid, email, display_name, account_type)
+            VALUES ($1, $2, $3, $4)
+            RETURNING *;
         `;
-        const values = [name, email, hashedPassword, false];
+        const values = [firebaseUID, email, name || null, "free"];
         const result = await pool.query(query, values);
 
-        const userId = result.rows[0].id;
+        console.log("User saved in PostgreSQL:", result.rows[0]);
 
-        // Generate verification token
-        const verificationToken = generateVerificationToken(userId);
-        if (!verificationToken) {
-            res.status(500).json({
-                error: "Failed to generate verification token",
-            });
-            return;
-        }
-
-        // Send verification email
-        const emailSent = await sendVerificationEmail(email, verificationToken);
-        if (!emailSent) {
-            res.status(500).json({
-                error: "Failed to send verification email",
-            });
-            return;
-        }
-
+        // Respond with user details
         res.status(201).json({
-            message: "User created successfully. Please verify your email.",
-            token: verificationToken,
+            message: "User created successfully!",
+            user: {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+            },
         });
-    } catch (err) {
-        console.error("Error creating user:", err);
-        res.status(500).json({ error: "Internal server error" });
+    } catch (error: unknown) {
+        // Handle Firebase-specific errors
+        if (error instanceof FirebaseError) {
+            res.status(400).json({
+                message: "User creation failed.",
+                errorCode: error.code,
+                errorMessage: error.message,
+            });
+        } else {
+            // Handle unexpected errors
+            res.status(500).json({
+                message: "An unexpected error occurred.",
+                error: error instanceof Error ? error.message : "Unknown error",
+            });
+        }
     }
 };
 
-export const loginUser: (req: Request, res: Response) => Promise<void> = async (
-    req,
-    res
-) => {
+/**
+ * Login a user with email and password, and fetch profile from PostgreSQL.
+ * Ensures email verification before allowing access.
+ * @param req - Express request object
+ * @param res - Express response object
+ */
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
-        res.status(400).json({ error: "Email and password are required" });
+        res.status(400).json({ message: "Email and password are required." });
         return;
     }
 
     try {
-        // Fetch user by email
-        const query = `
-            SELECT id, name, email, password_hash, role, verified 
-            FROM users WHERE email = $1
-        `;
-        const result = await pool.query(query, [email]);
+        // Authenticate user with Firebase Auth
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+            res.status(403).json({ message: "Email not verified. Please verify your email before logging in." });
+            return;
+        }
+
+        // Fetch user profile from PostgreSQL
+        const query = 'SELECT * FROM users WHERE firebase_uid = $1';
+        const values = [user.uid];
+        const result = await pool.query(query, values);
 
         if (result.rows.length === 0) {
-            res.status(401).json({ error: "Invalid email or password" });
+            res.status(404).json({ message: "User profile not found." });
             return;
         }
 
-        const user = result.rows[0];
+        const userProfile = result.rows[0];
 
-        // Check if user is verified
-        if (!user.verified) {
-            res.status(403).json({
-                error: "Account is not verified. Please verify your email before logging in.",
-            });
-            return;
-        }
-
-        // Compare password with hash
-        const isPasswordValid = await bcrypt.compare(
-            password,
-            user.password_hash
-        );
-
-        if (!isPasswordValid) {
-            res.status(401).json({ error: "Invalid email or password" });
-            return;
-        }
-
-        // Generate JWT
-        const token = jwt.sign(
-            {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
-            process.env.JWT_SECRET as string, // Use a strong secret stored in your environment variables
-            { expiresIn: "1h" } // Token expires in 1 hour
-        );
-
-        // Send response
+        // Respond with user details and profile
         res.status(200).json({
-            message: "Login successful",
-            token, // Include the JWT token
+            message: "Login successful!",
             user: {
-                id: user.id,
-                name: user.name,
+                uid: user.uid,
                 email: user.email,
-                role: user.role,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                profile: userProfile, // Include profile details from PostgreSQL
             },
         });
-    } catch (err) {
-        console.error("Error during login:", err);
-        res.status(500).json({ error: "Internal server error" });
+    } catch (error: unknown) {
+        // Handle Firebase-specific errors
+        if (error instanceof FirebaseError) {
+            res.status(401).json({
+                message: "Login failed. Please check that your email and password are correct.",
+                errorCode: error.code,
+                errorMessage: error.message,
+            });
+        } else {
+            // Handle unexpected errors
+            res.status(500).json({
+                message: "An unexpected error occurred.",
+                error: error instanceof Error ? error.message : "Unknown error",
+            });
+        }
     }
 };
