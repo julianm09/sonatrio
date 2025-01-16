@@ -6,6 +6,7 @@ dist/
 
 # Environment files
 .env
+sonatrio-firebase-adminsdk-5ytkw-c8d13500ab.json
 
 # Logs
 logs/
