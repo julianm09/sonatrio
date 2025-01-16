@@ -1,23 +1,30 @@
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import styles from "./LoginForm.module.scss";
 import { loginUser, registerUser } from "@/utils/api/userApi";
 import axios from "axios";
+import { useAppContext } from "@/context/AppContext";
+import { useRouter } from "next/navigation";
 
-interface LoginData {
-    name: string;
-    email: string;
-    password: string;
-}
+const LoginForm: React.FC = ({}) => {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+    });
 
-interface LoginFormProps {
-    formData: LoginData;
-    setFormData: React.Dispatch<React.SetStateAction<LoginData>>;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
     const [login, setLogin] = useState(true);
     const [verifyPassword, setVerifyPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
+
+    const { user, setUser } = useAppContext();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (user) {
+            router.push("/");
+        }
+    }, [user, router]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -25,9 +32,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
     };
 
     const handleLoginSwitch = () => {
-        setLogin(!login)
-        setError(null)
-    }
+        setLogin(!login);
+        setError(null);
+    };
 
     const handleLoginSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,6 +42,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
             const result = await loginUser(formData);
             console.log("Login successful:", result);
             setError(null);
+            setUser(result.user.profile);
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 // Handle Axios error with a response
@@ -174,10 +182,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ formData, setFormData }) => {
                     </button>
                 </form>
             )}
-            <div
-                className={styles["login-switch"]}
-                onClick={handleLoginSwitch}
-            >
+            <div className={styles["login-switch"]} onClick={handleLoginSwitch}>
                 {login ? "Need an account? Sign up" : "Have an account? Login"}
             </div>
             <div className={styles["error-message"]}>{error}</div>

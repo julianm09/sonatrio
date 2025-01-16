@@ -1,9 +1,14 @@
+"use client";
 import styles from "./page.module.css";
+import { useAppContext } from "@/context/AppContext";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
+    const { user } = useAppContext();
+    console.log(user)
 
-    </div>
-  );
+    return (
+        <div className={styles.page}>
+
+        </div>
+    );
 }
