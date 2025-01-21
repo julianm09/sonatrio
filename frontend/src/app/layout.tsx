@@ -2,6 +2,16 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppContextProvider } from '@/context/AppContext';
+import localFont from "next/font/local";
+
+const satoshi = localFont({
+  src: [
+      {
+          path: "../../public/fonts/Satoshi-Variable.ttf",
+      },
+  ],
+  variable: "--font-satoshi",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${satoshi.variable}`}>
         <AppContextProvider>{children}</AppContextProvider>
       </body>
     </html>

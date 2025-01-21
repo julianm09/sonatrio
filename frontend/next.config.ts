@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '1000mb', // Set the limit to 10 MB or adjust as needed
+    },
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
