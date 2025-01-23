@@ -2,7 +2,10 @@ import ffmpeg from "fluent-ffmpeg";
 import path from "path";
 import fs from "fs";
 
-export const convertToMp3 = (inputPath: string, outputPath: string): Promise<void> => {
+export const convertToMp3 = (
+    inputPath: string,
+    outputPath: string
+): Promise<void> => {
     return new Promise((resolve, reject) => {
         if (!fs.existsSync(inputPath)) {
             return reject(new Error("Input file does not exist."));
