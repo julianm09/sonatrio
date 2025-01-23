@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./Navbar.module.scss";
+import { Menu } from "react-feather";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -16,11 +17,12 @@ const Navbar = () => {
                 onClick={toggleNavbar}
                 aria-label="Toggle navigation"
             >
-                ☰
+                <Menu size={18} />
             </button>
-            <div className={`${styles.links} ${isOpen ? styles.open : ""}`}>
-                <a href="/pricing">Pricing</a>
-                <a href="/profile">Profile</a>
+            <div className={`${styles.links} ${isOpen ? styles["open"] : ""}`}>
+                <a href="/login">
+                    Log In
+                </a>
             </div>
         </nav>
     );

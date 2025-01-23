@@ -1,0 +1,134 @@
+.container-label {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label {
+        font-size: 17px;
+        font-weight: 500;
+    }
+
+    .actions {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+
+        .copy,
+        .save {
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+
+            &:hover {
+                color: #ac93ff;
+            }
+        }
+    }
+}
+
+.output-container {
+    font-family: Arial, sans-serif;
+    line-height: 1.8;
+    padding: 40px;
+    background-color: #1e1e1e; /* Dark background */
+    color: #f5f5f5; /* Light text for readability */
+    border: 1px solid #333; /* Subtle border */
+    width: 100%;
+    min-height: 200px;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #ffffff; /* White for headings */
+        margin-top: 0px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    h1 {
+        font-size: 2rem;
+        border-bottom: 2px solid #444; /* Underline for H1 */
+        padding-bottom: 10px;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+        color: #dddddd;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        color: #bbbbbb;
+    }
+
+    p {
+        color: #cccccc; /* Light gray for paragraph text */
+        margin-bottom: 15px;
+    }
+
+    ul,
+    ol {
+        margin-left: 20px;
+        margin-bottom: 15px;
+
+        li {
+            color: #f5f5f5; /* Same as the main text color */
+            margin-bottom: 8px;
+
+            &::marker {
+                color: #888888; /* Custom bullet or numbering color */
+            }
+        }
+    }
+
+    pre {
+        background-color: #2d2d2d; /* Darker theme for code blocks */
+        color: #f8f8f2; /* Light text for code */
+        padding: 15px;
+        border-radius: 6px;
+        overflow-x: auto; /* Scroll for long lines */
+        font-family: "Courier New", Courier, monospace;
+        font-size: 0.9rem;
+        border: 1px solid #444;
+        margin-bottom: 15px;
+    }
+
+    blockquote {
+        border-left: 4px solid #444;
+        padding-left: 15px;
+        margin: 15px 0;
+        color: #bbbbbb; /* Slightly lighter than paragraph text */
+        font-style: italic;
+        background-color: #2a2a2a; /* Subtle contrast for blockquote background */
+    }
+
+    a {
+        color: #4ea8fc; /* Light blue for links */
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    code {
+        background-color: #2d2d2d; /* Darker inline code background */
+        color: #c678dd; /* Purple color for inline code */
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-family: "Courier New", Courier, monospace;
+    }
+
+    hr {
+        margin-bottom: 15px;
+    }
+
+    .placeholder {
+        color: #757575;
+        cursor: default;
+    }
+}
