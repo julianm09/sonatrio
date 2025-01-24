@@ -68,11 +68,12 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
             />
 
             <div className={styles["output-container"]}>
-                {outputText ? (
+                {!converting && outputText ? (
                     <ReactMarkdown>{outputText}</ReactMarkdown>
                 ) : converting ? (
                     <div className={styles["placeholder"]}>
-                        Hang on! We&apos;re processing your file...
+                        Hang on! We&apos;re processing your file. This might
+                        take a few moments depending on the file size... <span className={styles["loader"]}></span>
                     </div>
                 ) : (
                     <div className={styles["placeholder"]}>
