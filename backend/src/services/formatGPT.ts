@@ -2,24 +2,37 @@ import { openai } from "../utils/openai";
 
 export const formatGPT = async (
     transcript: string,
-    format: string
+    format: string,
+    tone: string,
+    audience: string
 ): Promise<string | null> => {
     try {
-        if (format === "transcript") {
-            return transcript;
+        // Build the dynamic base prompt
+        let basePrompt = `Convert the following transcript`;
+        if (audience) basePrompt += ` for a ${audience} audience`;
+        if (tone) basePrompt += ` in a ${tone} tone`;
+        if (format) basePrompt += `. The format should be a ${format}`;
+
+        if (tone === "original-source") {
+            basePrompt = `Convert the following transcript keeping the tone, language, punctuation and level used as close as possible to the source text (even if bad words). The format should be a ${format}.`;
         }
 
-        // Define a mapping of formats to their descriptions
+        if (format === "transcript") {
+            basePrompt = ``;
+        }
+
+        // Define specific format instructions
         const formatPrompts: Record<string, string> = {
-            "blog-post": `Convert the following transcript to a blog post with rich text: ${transcript}`,
-            "ad-copy": `Convert the following transcript to ad copy: ${transcript}`,
-            "instagram-post": `Convert the following transcript to a Instagram post: ${transcript}`,
-            "facebook-post": `Convert the following transcript to a Facebook post: ${transcript}`,
-            "tiktok-script": `Convert the following transcript to a TikTok script: ${transcript}`,
-            "youtube-script": `Convert the following transcript to a YouTube script: ${transcript}`,
-            "linkedin-post": `Convert the following transcript to a LinkedIn post: ${transcript}`,
-            "tutorial": `Convert the following transcript to a tutorial: ${transcript}`,
-            "study-guide": `Convert the following transcript to a study guide: ${transcript}`,
+            "blog-post": `Write a well-structured blog post with headings, subheadings, and rich text: ${transcript}`,
+            "ad-copy": `Create engaging ad copy: ${transcript}`,
+            "instagram-post": `Craft a compelling Instagram post with hashtags and emojis: ${transcript}`,
+            "facebook-post": `Write an engaging Facebook post: ${transcript}`,
+            "tiktok-script": `Create a script for a short and engaging TikTok video: ${transcript}`,
+            "youtube-script": `Write a detailed script for a YouTube video: ${transcript}`,
+            "linkedin-post": `Compose a professional LinkedIn post: ${transcript}`,
+            "tutorial": `Write a step-by-step tutorial: ${transcript}`,
+            "transcript": `Format the following into readable paragraphs without changing wording or punctuation: ${transcript}`,
+            "study-guide": `Create a concise and structured study guide: ${transcript}`,
         };
 
         // Check if the format is supported
@@ -27,15 +40,18 @@ export const formatGPT = async (
             throw new Error(`Unsupported format: ${format}`);
         }
 
-        // Use the corresponding content prompt
-        const content = formatPrompts[format];
+        // Combine the base prompt with format-specific instructions
+        const content = `${basePrompt} ${formatPrompts[format]}`;
 
         // Call OpenAI's API
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             store: true,
             messages: [
-                { role: "system", content: "You are a copywriter for a marketing agency." },
+                {
+                    role: "system",
+                    content: "You are a professional content generator.",
+                },
                 { role: "user", content: content },
             ],
         });
