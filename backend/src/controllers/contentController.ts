@@ -8,6 +8,8 @@ export const handlegenerateContent = async (
 ): Promise<void> => {
     try {
         const format = req.body.format;
+        const tone = req.body.tone;
+        const audience = req.body.audience;
         let transcript = req.body.transcript;
 
         // If transcript is not provided, check for uploaded file
@@ -29,7 +31,7 @@ export const handlegenerateContent = async (
         }
 
         // Generate content from the transcript and format
-        const content = await formatGPT(transcript, format);
+        const content = await formatGPT(transcript, format, tone, audience);
 
         // Respond with the transcript and formatted content
         res.status(200).send({

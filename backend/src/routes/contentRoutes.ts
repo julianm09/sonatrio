@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { handlegenerateContent } from "../controllers/transcriptionController";
+import { handlegenerateContent } from "../controllers/contentController";
 import { uploadMiddleware } from "../middleware/multer";
 
 const router = Router();
