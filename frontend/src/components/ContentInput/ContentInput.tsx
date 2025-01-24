@@ -41,6 +41,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
         { value: "tutorial", label: "Tutorial" },
         { value: "study-guide", label: "Study Guide" },
         { value: "transcript", label: "Transcript" },
+        { value: "summary", label: "Summary" },
     ];
 
     const handleFormatChange = (
@@ -123,14 +124,18 @@ const ContentInput: React.FC<ContentInputProps> = ({
                 />
 
                 <button
-                    className={styles["convert-button"]}
-                    onClick={handleConversion}
+                    className={`${styles["convert-button"]} ${
+                        converting ? styles["inactive"] : ""
+                    }`}
+                    onClick={!converting ? handleConversion : () => {}}
                 >
-                    {converting
-                        ? "Generating Content..."
-                        : transcript
-                        ? "Regenerate Content"
-                        : "Generate Content"}
+                    {converting ? (
+                        <>Generating Content...</>
+                    ) : transcript ? (
+                        "Regenerate Content"
+                    ) : (
+                        "Generate Content"
+                    )}
                 </button>
             </div>
         </>
