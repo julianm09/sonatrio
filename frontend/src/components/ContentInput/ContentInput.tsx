@@ -2,6 +2,8 @@
 import { Settings } from "react-feather";
 import styles from "./ContentInput.module.scss";
 import React, { ChangeEvent } from "react";
+import LabelHeader from "../LabelHeader/LabelHeader";
+import Dropdown from "../Dropdown/Dropdown";
 
 interface ContentInputProps {
     selectedFormat: string;
@@ -13,6 +15,7 @@ interface ContentInputProps {
     converting: boolean;
     transcript: string | null;
     handleConversion: () => Promise<void>;
+    handleToggleSettings: () => void;
 }
 
 const ContentInput: React.FC<ContentInputProps> = ({
@@ -24,10 +27,25 @@ const ContentInput: React.FC<ContentInputProps> = ({
     setIsDragging,
     converting,
     transcript,
-
     handleConversion,
+    handleToggleSettings,
 }) => {
-    const handleFormat = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const options = [
+        { value: "blog-post", label: "Blog Post" },
+        { value: "ad-copy", label: "Ad Copy" },
+        { value: "instagram-post", label: "Instagram Post" },
+        { value: "facebook-post", label: "Facebook Post" },
+        { value: "tiktok-script", label: "Tiktok Script" },
+        { value: "youtube-script", label: "Youtube Script" },
+        { value: "linkedin-post", label: "LinkedIn Post" },
+        { value: "tutorial", label: "Tutorial" },
+        { value: "study-guide", label: "Study Guide" },
+        { value: "transcript", label: "Transcript" },
+    ];
+
+    const handleFormatChange = (
+        event: React.ChangeEvent<HTMLSelectElement>
+    ) => {
         setSelectedFormat(event.target.value);
     };
 
@@ -58,16 +76,15 @@ const ContentInput: React.FC<ContentInputProps> = ({
 
     return (
         <>
-            <div className={styles["container-label"]}>
-                <div className={styles["label"]}>
-                    Convert Your Audio or Video File
-                </div>{" "}
-                <div className={styles["actions"]}>
-                    <div className={styles["save"]}>
-                        <Settings size={18} />
-                    </div>
-                </div>
-            </div>
+            <LabelHeader
+                label="Convert Your Audio or Video File"
+                actions={[
+                    {
+                        icon: <Settings size={18} />,
+                        onClick: handleToggleSettings,
+                    },
+                ]}
+            />
             <div
                 className={styles["input-container"]}
                 onDragOver={handleDragOver}
@@ -98,25 +115,12 @@ const ContentInput: React.FC<ContentInputProps> = ({
                     )}
                 </label>
 
-                <select
-                    className={styles["convert-select"]}
+                <Dropdown
+                    options={options}
                     value={selectedFormat}
-                    onChange={handleFormat}
-                >
-                    <option value="" disabled>
-                        Choose an output format:
-                    </option>
-                    <option value="blog-post">Blog Post</option>
-                    <option value="ad-copy">Ad Copy</option>
-                    <option value="instagram-post">Instagram Post</option>
-                    <option value="facebook-post">Facebook Post</option>
-                    <option value="tiktok-script">Tiktok Script</option>
-                    <option value="youtube-script">Youtube Script</option>
-                    <option value="linkedin-post">LinkedIn Post</option>
-                    <option value="tutorial">Tutorial</option>
-                    <option value="study-guide">Study Guide</option>
-                    <option value="transcript">Transcript</option>
-                </select>
+                    onChange={handleFormatChange}
+                    placeholder="Choose an output format"
+                />
 
                 <button
                     className={styles["convert-button"]}

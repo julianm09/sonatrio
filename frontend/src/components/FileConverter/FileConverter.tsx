@@ -5,6 +5,7 @@ import ContentDisplay from "../ContentDisplay/ContentDisplay";
 import ContentInput from "../ContentInput/ContentInput";
 import axios from "axios";
 import { generateContent } from "@/utils/api/contentApi";
+import ContentSettings from "../ContentSettings/ContentSettings";
 
 const FileConverter: React.FC = ({}) => {
     const [file, setFile] = useState<File | null>(null);
@@ -14,6 +15,16 @@ const FileConverter: React.FC = ({}) => {
     const [selectedFormat, setSelectedFormat] = useState("");
     const [converting, setConverting] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [openSettings, setOpenSettings] = useState(false);
+
+    const handleToggleSettings = () => {
+        setOpenSettings(!openSettings);
+    };
+
+    const [contentSettings, setContentSettings] = useState({
+        tone: "",
+        audience: "",
+    });
 
     // Reset transcription when new file is selected
     useEffect(() => {
@@ -39,6 +50,8 @@ const FileConverter: React.FC = ({}) => {
         }
 
         formData.append("format", selectedFormat);
+        formData.append("tone", contentSettings.tone);
+        formData.append("audience", contentSettings.audience);
 
         setConverting(true);
 
@@ -69,6 +82,14 @@ const FileConverter: React.FC = ({}) => {
 
     return (
         <div className={styles["container"]}>
+            {openSettings && (
+                <ContentSettings
+                    handleToggleSettings={handleToggleSettings}
+                    contentSettings={contentSettings}
+                    setContentSettings={setContentSettings}
+                />
+            )}
+
             <ContentInput
                 selectedFormat={selectedFormat}
                 setSelectedFormat={setSelectedFormat}
@@ -79,6 +100,7 @@ const FileConverter: React.FC = ({}) => {
                 converting={converting}
                 transcript={transcript}
                 handleConversion={handleConversion}
+                handleToggleSettings={handleToggleSettings}
             />
 
             <ContentDisplay

@@ -1,0 +1,26 @@
+.container-label {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label {
+        font-size: 17px;
+        font-weight: 500;
+    }
+
+    .actions {
+        display: flex;
+        gap: 40px;
+
+        & > * {
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+
+            &:hover {
+                color: #ac93ff;
+            }
+        }
+    }
+}
