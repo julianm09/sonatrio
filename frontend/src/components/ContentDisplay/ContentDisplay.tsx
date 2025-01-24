@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { marked } from "marked";
 import styles from "./ContentDisplay.module.scss";
 import { Copy, Save } from "react-feather";
+import LabelHeader from "../LabelHeader/LabelHeader";
 
 interface ContentDisplayProps {
     outputText: string | null;
@@ -45,23 +46,26 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
         }
     };
 
+    const handleSave = () => {
+        return;
+    };
+
     return (
         <>
-            <div className={styles["container-label"]}>
-                <div className={styles["label"]}>Output</div>{" "}
-                <div className={styles["actions"]}>
-                    <div
-                        className={styles["copy"]}
-                        onClick={outputText ? handleCopyToClipboard : () => {}}
-                    >
-                        {copied ? "Copied to clipboard!" : <Copy size={18} />}
-                    </div>
-
-                    <div className={styles["save"]}>
-                        <Save size={18} />
-                    </div>
-                </div>
-            </div>
+            <LabelHeader
+                label="Output"
+                actions={[
+                    {
+                        icon: <Copy size={18} />,
+                        onClick: outputText ? handleCopyToClipboard : () => {},
+                        label: copied ? "Copied to clipboard!" : undefined,
+                    },
+                    {
+                        icon: <Save size={18} />,
+                        onClick: handleSave, // Add your save function
+                    },
+                ]}
+            />
 
             <div className={styles["output-container"]}>
                 {outputText ? (
