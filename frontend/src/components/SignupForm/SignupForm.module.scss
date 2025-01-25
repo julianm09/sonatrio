@@ -1,0 +1,47 @@
+.container {
+    margin-top: 40px;
+    display: inline-flex;
+    flex-direction: column;
+    max-width: 400px;
+    width: 90%;
+}
+
+.form {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 20px;
+}
+
+.input-container {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 5px;
+
+    label {
+        display: none;
+    }
+
+    input {
+        padding: 10px;
+        outline: none;
+        border: none;
+    }
+}
+
+.login-button {
+    padding: 10px;
+    cursor: pointer;
+    border: 0px;
+    outline: 0;
+}
+
+.login-switch {
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+
+.error-message {
+    margin-top: 40px;
+    color: rgb(188, 0, 0);
+}
