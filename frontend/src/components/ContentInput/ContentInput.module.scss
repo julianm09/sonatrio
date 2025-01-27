@@ -1,58 +1,71 @@
-.container-label {
-    margin-bottom: 20px;
+.container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    background-color: #333;
     align-items: center;
-
-    .label {
-        font-size: 17px;
-        font-weight: 500;
-    }
-
-    .actions {
-        display: flex;
-        gap: 40px;
-
-        .copy,
-        .refresh,
-        .save {
-            cursor: pointer;
-            transition: color 0.3s;
-            display: flex;
-
-            &:hover {
-                color: #ac93ff;
-            }
-        }
-    }
+    height: 140px;
+    background-color: #1e1e1e; /* Dark background */
 }
+
 
 .input-container {
     display: flex;
+    flex-direction: row;
     width: 100%;
-    gap: 20px; /* Updated from grid-gap for modern syntax */
-    background-color: #393939; /* Explicit 'color' for consistency */
-    padding: 40px;
-    margin-bottom: 80px;
-
-    @media only screen and (max-width: 780px) {
-        flex-direction: column;
-    }
-
-    @media only screen and (max-width: 950px) {
-        padding: 20px;
-    }
+    max-width: 800px;
+    gap: 20px;
+    align-items: center;
 
     .file-input {
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
-        padding: 15px;
         border-radius: 5px;
         text-align: center;
         font-size: 15px;
         color: #f3f3f3;
         cursor: pointer;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        height: 40px;
+    }
+}
+
+.format-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
+.action-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.loader {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ac93ff;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }

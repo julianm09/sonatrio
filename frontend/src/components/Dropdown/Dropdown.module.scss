@@ -3,7 +3,6 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 15px;
     font-size: 15px;
     text-align: center;
     background-color: #333;
@@ -12,4 +11,5 @@
     outline: 1px solid rgba(243, 243, 243, 0.44);
     cursor: pointer;
     appearance: none; /* Consolidated vendor prefixes */
+    height: 40px;
 }

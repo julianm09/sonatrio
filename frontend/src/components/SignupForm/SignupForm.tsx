@@ -6,8 +6,8 @@ import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
 import TextInput from "../TextInput/TextInput";
-import ActionButton from "../ActionButton/ActionButton";
 import LabelHeader from "../LabelHeader/LabelHeader";
+import SubmitButton from "../SubmitButton/SubmitButton";
 
 const SignupForm: React.FC = ({}) => {
     const [formData, setFormData] = useState({
@@ -101,7 +101,7 @@ const SignupForm: React.FC = ({}) => {
                     }}
                 />
 
-                <ActionButton label={"Sign Up"} type="submit" />
+                <SubmitButton label={"Sign Up"} type="submit" />
             </form>
 
             <a className={styles["login-switch"]} href="/login">

@@ -21,6 +21,14 @@
             &:hover {
                 color: #ac93ff;
             }
+
+            &.highlight {
+                color: #ac93ff;
+
+                &:hover {
+                    color: #6739ff;
+                }
+            }
         }
     }
 }
