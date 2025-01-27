@@ -58,8 +58,6 @@ const FileConverter: React.FC = ({}) => {
         try {
             const response = await generateContent(formData);
 
-            console.log(response);
-
             setOutputText(response.content || "Conversion successful!");
             if (response.transcript) {
                 setTranscript(response.transcript);

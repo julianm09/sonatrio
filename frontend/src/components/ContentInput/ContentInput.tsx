@@ -78,7 +78,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
     };
 
     return (
-        <>
+        <div className={styles["container"]}>
             <LabelHeader
                 label="Convert Your Audio or Video File"
                 actions={[
@@ -139,7 +139,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
                     }
                 />
             </div>
-        </>
+        </div>
     );
 };
 

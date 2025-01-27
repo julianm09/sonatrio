@@ -101,17 +101,27 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     try {
         // Authenticate user with Firebase Auth
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
         const user = userCredential.user;
 
         // Check if email is verified
         if (!user.emailVerified) {
-            res.status(403).json({ message: "Email not verified. Please verify your email before logging in." });
+            res.status(403).json({
+                message:
+                    "Email not verified. Please verify your email before logging in.",
+            });
             return;
         }
 
+        // Get Firebase ID Token
+        const idToken = await user.getIdToken();
+
         // Fetch user profile from PostgreSQL
-        const query = 'SELECT * FROM users WHERE firebase_uid = $1';
+        const query = "SELECT * FROM users WHERE firebase_uid = $1";
         const values = [user.uid];
         const result = await pool.query(query, values);
 
@@ -125,6 +135,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         // Respond with user details and profile
         res.status(200).json({
             message: "Login successful!",
+            token: idToken, // Firebase ID token
             user: {
                 uid: user.uid,
                 email: user.email,
@@ -137,7 +148,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         // Handle Firebase-specific errors
         if (error instanceof FirebaseError) {
             res.status(401).json({
-                message: "Login failed. Please check that your email and password are correct.",
+                message:
+                    "Login failed. Please check that your email and password are correct.",
                 errorCode: error.code,
                 errorMessage: error.message,
             });

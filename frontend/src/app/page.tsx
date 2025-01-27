@@ -2,15 +2,15 @@
 import FileConverter from "@/components/FileConverter/FileConverter";
 import styles from "./page.module.css";
 import { useAppContext } from "@/context/AppContext";
-import Navbar from "@/components/Navbar/Navbar";
+import SideNavbar from "@/components/SideNavbar/SideNavbar";
 
 export default function Home() {
     const { user } = useAppContext();
-    console.log(user)
+    console.log("user:", user);
 
     return (
         <div className={styles["page"]}>
-            <Navbar/>
+            <SideNavbar/>
             <FileConverter/>
         </div>
     );

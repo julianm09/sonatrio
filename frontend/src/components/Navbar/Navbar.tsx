@@ -1,8 +1,11 @@
 import { useState } from "react";
 import styles from "./Navbar.module.scss";
 import { Menu } from "react-feather";
+import { useAppContext } from "@/context/AppContext";
 
 const Navbar = () => {
+    const { user, logout } = useAppContext();
+
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleNavbar = () => {
@@ -20,9 +23,11 @@ const Navbar = () => {
                 <Menu size={18} />
             </button>
             <div className={`${styles.links} ${isOpen ? styles["open"] : ""}`}>
-                <a href="/login">
-                    Log In
-                </a>
+                {user ? (
+                    <div onClick={logout}>Sign Out</div>
+                ) : (
+                    <a href="/login">Sign In</a>
+                )}
             </div>
         </nav>
     );

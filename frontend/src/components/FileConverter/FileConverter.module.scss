@@ -1,9 +1,10 @@
 .container {
-    margin-top: 80px;
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding: 0 10vw;
+    padding: 100px 10vw 0;
+    justify-content: flex-start;
+    position: relative;
 
     @media only screen and (max-width: 950px) {
         padding: 20px;
