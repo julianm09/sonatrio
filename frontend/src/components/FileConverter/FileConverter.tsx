@@ -106,6 +106,7 @@ const FileConverter: React.FC = ({}) => {
                 converting={converting}
                 setCopied={setCopied}
                 copied={copied}
+                handleConversion={handleConversion}
             />
         </div>
     );

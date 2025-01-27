@@ -2,7 +2,7 @@
 import ReactMarkdown from "react-markdown";
 import { marked } from "marked";
 import styles from "./ContentDisplay.module.scss";
-import { Copy, Save } from "react-feather";
+import { Copy, RefreshCw } from "react-feather";
 import LabelHeader from "../LabelHeader/LabelHeader";
 
 interface ContentDisplayProps {
@@ -10,6 +10,7 @@ interface ContentDisplayProps {
     converting: boolean;
     copied: boolean;
     setCopied: React.Dispatch<React.SetStateAction<boolean>>;
+    handleConversion: () => Promise<void>;
 }
 
 const ContentDisplay: React.FC<ContentDisplayProps> = ({
@@ -17,6 +18,7 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
     converting,
     copied,
     setCopied,
+    handleConversion,
 }) => {
     const handleCopyToClipboard = async (): Promise<void> => {
         setCopied(true);
@@ -46,34 +48,36 @@ const ContentDisplay: React.FC<ContentDisplayProps> = ({
         }
     };
 
-    const handleSave = () => {
-        return;
-    };
-
     return (
         <>
-            <LabelHeader
-                label="Output"
-                actions={[
-                    {
-                        icon: <Copy size={18} />,
-                        onClick: outputText ? handleCopyToClipboard : () => {},
-                        label: copied ? "Copied to clipboard!" : undefined,
-                    },
-                    {
-                        icon: <Save size={18} />,
-                        onClick: handleSave, // Add your save function
-                    },
-                ]}
-            />
-
             <div className={styles["output-container"]}>
                 {!converting && outputText ? (
-                    <ReactMarkdown>{outputText}</ReactMarkdown>
+                    <>
+                        <LabelHeader
+                            label="Output"
+                            actions={[
+                                {
+                                    icon: <Copy size={18} />,
+                                    onClick: outputText
+                                        ? handleCopyToClipboard
+                                        : () => {},
+                                    label: copied
+                                        ? "Copied to clipboard!"
+                                        : undefined,
+                                },
+                                {
+                                    icon: <RefreshCw size={18} />,
+                                    onClick: handleConversion,
+                                },
+                            ]}
+                        />
+                        <ReactMarkdown>{outputText}</ReactMarkdown>
+                    </>
                 ) : converting ? (
                     <div className={styles["placeholder"]}>
                         Hang on! We&apos;re processing your file. This might
-                        take a few moments depending on the file size... <span className={styles["loader"]}></span>
+                        take a few moments depending on the file size...{" "}
+                        <span className={styles["loader"]}></span>
                     </div>
                 ) : (
                     <div className={styles["placeholder"]}>

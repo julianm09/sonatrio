@@ -1,8 +1,7 @@
 "use client";
-import { Settings } from "react-feather";
+import { ArrowUp, Paperclip, Settings } from "react-feather";
 import styles from "./ContentInput.module.scss";
 import React, { ChangeEvent } from "react";
-import LabelHeader from "../LabelHeader/LabelHeader";
 import Dropdown from "../Dropdown/Dropdown";
 import ActionButton from "../ActionButton/ActionButton";
 
@@ -27,7 +26,6 @@ const ContentInput: React.FC<ContentInputProps> = ({
     isDragging,
     setIsDragging,
     converting,
-    transcript,
     handleConversion,
     handleToggleSettings,
 }) => {
@@ -79,21 +77,19 @@ const ContentInput: React.FC<ContentInputProps> = ({
 
     return (
         <div className={styles["container"]}>
-            <LabelHeader
-                label="Convert Your Audio or Video File"
-                actions={[
-                    {
-                        icon: <Settings size={18} />,
-                        onClick: handleToggleSettings,
-                    },
-                ]}
-            />
             <div
                 className={styles["input-container"]}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
+                <label htmlFor="file-input">
+                    <Paperclip size={18} />
+                </label>
+
+                <div>
+                    <Settings size={18} onClick={handleToggleSettings} />
+                </div>
                 <input
                     type="file"
                     onChange={handleFileInput}
@@ -130,11 +126,9 @@ const ContentInput: React.FC<ContentInputProps> = ({
                     disabled={converting}
                     label={
                         converting ? (
-                            <>Generating Content...</>
-                        ) : transcript ? (
-                            "Regenerate Content"
+                            <span className={styles["loader"]}></span>
                         ) : (
-                            "Generate Content"
+                            <ArrowUp size={18} />
                         )
                     }
                 />

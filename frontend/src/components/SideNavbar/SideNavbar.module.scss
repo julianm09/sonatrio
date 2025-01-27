@@ -14,9 +14,6 @@ $text-color: #f3f3f3;
     transition: width 0.3s ease;
     overflow: hidden;
     border-right: 1px solid #393939;
-    position: fixed;
-    left: 0;
-    z-index: 99;
 
     &.collapsed {
         width: $sidebar-collapsed-width;
