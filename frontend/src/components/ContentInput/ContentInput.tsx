@@ -4,6 +4,7 @@ import styles from "./ContentInput.module.scss";
 import React, { ChangeEvent } from "react";
 import LabelHeader from "../LabelHeader/LabelHeader";
 import Dropdown from "../Dropdown/Dropdown";
+import ActionButton from "../ActionButton/ActionButton";
 
 interface ContentInputProps {
     selectedFormat: string;
@@ -42,6 +43,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
         { value: "study-guide", label: "Study Guide" },
         { value: "transcript", label: "Transcript" },
         { value: "summary", label: "Summary" },
+        { value: "website-copy", label: "Website Copy" },
     ];
 
     const handleFormatChange = (
@@ -76,7 +78,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
     };
 
     return (
-        <>
+        <div className={styles["container"]}>
             <LabelHeader
                 label="Convert Your Audio or Video File"
                 actions={[
@@ -123,22 +125,21 @@ const ContentInput: React.FC<ContentInputProps> = ({
                     placeholder="Choose an output format"
                 />
 
-                <button
-                    className={`${styles["convert-button"]} ${
-                        converting ? styles["inactive"] : ""
-                    }`}
-                    onClick={!converting ? handleConversion : () => {}}
-                >
-                    {converting ? (
-                        <>Generating Content...</>
-                    ) : transcript ? (
-                        "Regenerate Content"
-                    ) : (
-                        "Generate Content"
-                    )}
-                </button>
+                <ActionButton
+                    onClick={handleConversion}
+                    disabled={converting}
+                    label={
+                        converting ? (
+                            <>Generating Content...</>
+                        ) : transcript ? (
+                            "Regenerate Content"
+                        ) : (
+                            "Generate Content"
+                        )
+                    }
+                />
             </div>
-        </>
+        </div>
     );
 };
 

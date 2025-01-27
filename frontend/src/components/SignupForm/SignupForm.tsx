@@ -1,24 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
-import styles from "./LoginForm.module.scss";
-import { loginUser } from "@/utils/api/userApi";
+import styles from "./SignupForm.module.scss";
+import { registerUser } from "@/utils/api/userApi";
 import axios from "axios";
 import { useAppContext } from "@/context/AppContext";
 import { useRouter } from "next/navigation";
-import ActionButton from "../ActionButton/ActionButton";
 import TextInput from "../TextInput/TextInput";
+import ActionButton from "../ActionButton/ActionButton";
 import LabelHeader from "../LabelHeader/LabelHeader";
 
-const LoginForm: React.FC = ({}) => {
+const SignupForm: React.FC = ({}) => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         password: "",
     });
 
+    const [verifyPassword, setVerifyPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
 
-    const { user, setUser, setToken, logout } = useAppContext();
+    const { user } = useAppContext();
+
     const router = useRouter();
 
     useEffect(() => {
@@ -32,52 +34,44 @@ const LoginForm: React.FC = ({}) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleLoginSubmit = async (e: React.FormEvent) => {
+    const handleRegisterSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         try {
-            // Call the loginUser function with the provided formData
-            const result = await loginUser(formData);
-
-            // Clear any previous error (if applicable)
+            const result = await registerUser(formData);
+            console.log("User created:", result);
             setError(null);
-
-            // Update the user and token in context
-            setUser(result.user.profile);
-            setToken(result.token);
-
-            // Persist user profile and token to localStorage
-            localStorage.setItem("user", JSON.stringify(result.user.profile));
-            localStorage.setItem("token", result.token);
-
-            // Optionally redirect or perform other actions after login
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                // Handle Axios errors specifically
+                // Handle Axios error with a response
                 const errorMessage =
                     err.response?.data?.message ||
                     "An unexpected error occurred";
                 setError(errorMessage);
-                console.error("Axios Error:", errorMessage);
+                console.log("Axios Error:", errorMessage);
             } else if (err instanceof Error) {
                 // Handle generic errors
                 setError(err.message);
-                console.error("Generic Error:", err.message);
+                console.log("Generic Error:", err.message);
             } else {
-                // Handle unexpected errors
                 setError("An unexpected error occurred");
-                console.error("Unknown Error:", err);
+                console.log("Unknown Error:", err);
             }
-
-            // Optional: Logout user if an error occurs during login
-            logout();
         }
     };
 
     return (
         <div className={styles["container"]}>
-            <LabelHeader label="Log In" />
-            <form className={styles["form"]} onSubmit={handleLoginSubmit}>
+            <LabelHeader label="Sign Up" />
+            <form className={styles["form"]} onSubmit={handleRegisterSubmit}>
+                <TextInput
+                    label="Name"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    placeholder="Name"
+                    onChange={handleInputChange}
+                />
+
                 <TextInput
                     label="Email"
                     type="text"
@@ -96,15 +90,26 @@ const LoginForm: React.FC = ({}) => {
                     onChange={handleInputChange}
                 />
 
-                <ActionButton label={"Log In"} type="submit" />
+                <TextInput
+                    label="Verify Password"
+                    type="password"
+                    name="verify-password"
+                    value={verifyPassword}
+                    placeholder="Password"
+                    onChange={(e) => {
+                        setVerifyPassword(e.target.value);
+                    }}
+                />
+
+                <ActionButton label={"Sign Up"} type="submit" />
             </form>
 
-            <a className={styles["login-switch"]} href="/signup">
-                Need an account? Sign up
+            <a className={styles["login-switch"]} href="/login">
+                Have an account? Login
             </a>
             <div className={styles["error-message"]}>{error}</div>
         </div>
     );
 };
 
-export default LoginForm;
+export default SignupForm;
