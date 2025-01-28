@@ -2,139 +2,148 @@
 import { ArrowUp, Paperclip, Settings } from "react-feather";
 import styles from "./ContentInput.module.scss";
 import React, { ChangeEvent } from "react";
-import Dropdown from "../Dropdown/Dropdown";
 import ActionButton from "../ActionButton/ActionButton";
+import MultiSelectDropdown from "../MultiSelectDropdown/MultiSelectDropdown";
 
 interface ContentInputProps {
-    selectedFormat: string;
-    setSelectedFormat: React.Dispatch<React.SetStateAction<string>>;
-    file: File | null;
-    setFile: React.Dispatch<React.SetStateAction<File | null>>;
-    isDragging: boolean;
-    setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
-    converting: boolean;
-    transcript: string | null;
-    handleConversion: () => Promise<void>;
-    handleToggleSettings: () => void;
+	file: File | null;
+	setFile: React.Dispatch<React.SetStateAction<File | null>>;
+	isDragging: boolean;
+	setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
+	converting: boolean;
+	transcript: string | null;
+	handleConversion: () => Promise<void>;
+	handleToggleSettings: () => void;
+	selectedFormats: string[];
+	setSelectedFormats: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
+type Option = {
+	value: string;
+	label: string;
+};
+
+const options: Option[] = [
+	{ value: "blog-post", label: "Blog Post" },
+	{ value: "ad-copy", label: "Ad Copy" },
+	{ value: "instagram-post", label: "Instagram Post" },
+	{ value: "facebook-post", label: "Facebook Post" },
+	{ value: "tiktok-script", label: "Tiktok Script" },
+	{ value: "youtube-script", label: "Youtube Script" },
+	{ value: "linkedin-post", label: "LinkedIn Post" },
+	{ value: "tutorial", label: "Tutorial" },
+	{ value: "study-guide", label: "Study Guide" },
+	{ value: "transcript", label: "Transcript" },
+	{ value: "summary", label: "Summary" },
+	{ value: "website-copy", label: "Website Copy" },
+];
+
 const ContentInput: React.FC<ContentInputProps> = ({
-    selectedFormat,
-    setSelectedFormat,
-    file,
-    setFile,
-    isDragging,
-    setIsDragging,
-    converting,
-    handleConversion,
-    handleToggleSettings,
+	file,
+	setFile,
+	isDragging,
+	setIsDragging,
+	converting,
+	handleConversion,
+	handleToggleSettings,
+	selectedFormats,
+	setSelectedFormats,
 }) => {
-    const options = [
-        { value: "blog-post", label: "Blog Post" },
-        { value: "ad-copy", label: "Ad Copy" },
-        { value: "instagram-post", label: "Instagram Post" },
-        { value: "facebook-post", label: "Facebook Post" },
-        { value: "tiktok-script", label: "Tiktok Script" },
-        { value: "youtube-script", label: "Youtube Script" },
-        { value: "linkedin-post", label: "LinkedIn Post" },
-        { value: "tutorial", label: "Tutorial" },
-        { value: "study-guide", label: "Study Guide" },
-        { value: "transcript", label: "Transcript" },
-        { value: "summary", label: "Summary" },
-        { value: "website-copy", label: "Website Copy" },
-    ];
+	const handleFileInput = async (e: ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files && e.target.files.length > 0) {
+			setFile(e.target.files[0]);
+		}
+	};
 
-    const handleFormatChange = (
-        event: React.ChangeEvent<HTMLSelectElement>
-    ) => {
-        setSelectedFormat(event.target.value);
-    };
+	const handleDragOver = (e: React.DragEvent) => {
+		e.preventDefault();
+		setIsDragging(true);
+	};
 
-    const handleFileInput = async (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFile(e.target.files[0]);
-        }
-    };
+	const handleDragLeave = () => {
+		setIsDragging(false);
+	};
 
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
+	const handleDrop = (e: React.DragEvent) => {
+		e.preventDefault();
+		setIsDragging(false);
 
-    const handleDragLeave = () => {
-        setIsDragging(false);
-    };
+		if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			setFile(e.dataTransfer.files[0]);
+			e.dataTransfer.clearData();
+		}
+	};
 
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
+	const handleSelectionChange = (selected: string[]) => {
+		console.log("Selected options:", selected);
+	};
 
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            setFile(e.dataTransfer.files[0]);
-            e.dataTransfer.clearData();
-        }
-    };
+	return (
+		<div className={styles["container"]}>
+			<div
+				className={styles["input-container"]}
+				onDragOver={handleDragOver}
+				onDragLeave={handleDragLeave}
+				onDrop={handleDrop}
+			>
+				<label htmlFor="file-input">
+					<Paperclip size={18} />
+				</label>
 
-    return (
-        <div className={styles["container"]}>
-            <div
-                className={styles["input-container"]}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-                <label htmlFor="file-input">
-                    <Paperclip size={18} />
-                </label>
+				<div>
+					<Settings size={18} onClick={handleToggleSettings} />
+				</div>
+				<input
+					type="file"
+					onChange={handleFileInput}
+					style={{ display: "none" }}
+					id="file-input"
+				></input>
 
-                <div>
-                    <Settings size={18} onClick={handleToggleSettings} />
-                </div>
-                <input
-                    type="file"
-                    onChange={handleFileInput}
-                    style={{ display: "none" }}
-                    id="file-input"
-                ></input>
+				<label
+					className={styles["file-input"]}
+					htmlFor="file-input"
+					style={{
+						border: isDragging
+							? "1px dashed #AC93FF"
+							: "1px dashed #f3f3f370",
+						backgroundColor: isDragging ? "#34323A" : "#333",
+					}}
+				>
+					{file ? (
+						<p>{file.name}</p>
+					) : (
+						<p>Drop your video here, or click to select one.</p>
+					)}
+				</label>
 
-                <label
-                    className={styles["file-input"]}
-                    htmlFor="file-input"
-                    style={{
-                        border: isDragging
-                            ? "1px dashed #AC93FF"
-                            : "1px dashed #f3f3f370",
-                        backgroundColor: isDragging ? "#34323A" : "#333",
-                    }}
-                >
-                    {file ? (
-                        <p>{file.name}</p>
-                    ) : (
-                        <p>Drop your video here, or click to select one.</p>
-                    )}
-                </label>
-
-                <Dropdown
+				{/* <Dropdown
                     options={options}
                     value={selectedFormat}
                     onChange={handleFormatChange}
                     placeholder="Choose an output format"
-                />
+                /> */}
+				<MultiSelectDropdown
+					options={options}
+					onChange={handleSelectionChange}
+					selectedFormats={selectedFormats}
+					setSelectedFormats={setSelectedFormats}
+				/>
 
-                <ActionButton
-                    onClick={handleConversion}
-                    disabled={converting}
-                    label={
-                        converting ? (
-                            <span className={styles["loader"]}></span>
-                        ) : (
-                            <ArrowUp size={18} />
-                        )
-                    }
-                />
-            </div>
-        </div>
-    );
+				<ActionButton
+					onClick={handleConversion}
+					disabled={converting}
+					label={
+						converting ? (
+							<span className={styles["loader"]}></span>
+						) : (
+							<ArrowUp size={18} />
+						)
+					}
+				/>
+			</div>
+		</div>
+	);
 };
 
 export default ContentInput;

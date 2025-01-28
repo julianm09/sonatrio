@@ -1,164 +1,176 @@
 import { Request, Response } from "express";
-import pool from "../utils/db";
-import {
-    createUserWithEmailAndPassword,
-    sendEmailVerification,
-    signInWithEmailAndPassword,
-    updateProfile,
-} from "firebase/auth";
-import { FirebaseError } from "firebase/app";
-import { auth } from "../firebase";
+import { supabase } from "../utils/supabase";
 
 /**
- * Create a new user with Firebase Authentication and store user data in PostgreSQL.
+ * Create a new user with Supabase Authentication and store user data in Supabase database.
  * @param req - Express request object
  * @param res - Express response object
  */
 export const createUser = async (
-    req: Request,
-    res: Response
+	req: Request,
+	res: Response
 ): Promise<void> => {
-    const { name, email, password } = req.body;
+	const { name, email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-        res.status(400).json({ message: "Email and password are required." });
-        return;
-    }
+	// Validate input
+	if (!email || !password) {
+		res.status(400).json({ message: "Email and password are required." });
+		return;
+	}
 
-    try {
-        // Create user with Firebase Authentication
-        const userCredential = await createUserWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
-        const user = userCredential.user;
+	try {
+		// Create user with Supabase Authentication
+		const { data: authData, error: authError } = await supabase.auth.signUp(
+			{
+				email,
+				password,
+			}
+		);
 
-        // Update Firebase user's profile with display name
-        if (name) {
-            await updateProfile(user, { displayName: name });
-        }
+		if (authError) {
+			res.status(400).json({
+				message: "User creation failed.",
+				error: authError.message,
+			});
+			return;
+		}
 
-        // Send email verification
-        await sendEmailVerification(user);
-        console.log("Verification email sent.");
+		// Extract the user ID
+		const { user } = await authData;
 
-        // Save user information in PostgreSQL
-        const firebaseUID = user.uid;
-        const query = `
-            INSERT INTO users (firebase_uid, email, display_name, account_type)
-            VALUES ($1, $2, $3, $4)
-            RETURNING *;
-        `;
-        const values = [firebaseUID, email, name || null, "free"];
-        const result = await pool.query(query, values);
+		if (!user) {
+			res.status(500).json({
+				message: "User creation succeeded, but user data is missing.",
+			});
+			return;
+		}
 
-        console.log("User saved in PostgreSQL:", result.rows[0]);
+		if (!user.id || !user.email) {
+			console.error("Invalid user data:", {
+				id: user.id,
+				email: user.email,
+			});
+			res.status(400).json({ message: "Invalid user data." });
+			return;
+		}
 
-        // Respond with user details
-        res.status(201).json({
-            message: "User created successfully!",
-            user: {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-            },
-        });
-    } catch (error: unknown) {
-        // Handle Firebase-specific errors
-        if (error instanceof FirebaseError) {
-            res.status(400).json({
-                message: "User creation failed.",
-                errorCode: error.code,
-                errorMessage: error.message,
-            });
-        } else {
-            // Handle unexpected errors
-            res.status(500).json({
-                message: "An unexpected error occurred.",
-                error: error instanceof Error ? error.message : "Unknown error",
-            });
-        }
-    }
+		console.log(user.id, user.email, name);
+
+		// Save user information in Supabase database
+		const { error: dbError } = await supabase.from("users").insert([
+			{
+				user_id: user.id,
+				email: user.email,
+				username: name || null,
+				account_type: "free",
+			},
+		]);
+
+		if (dbError) {
+			res.status(500).json({
+				message: "Failed to save user in the database.",
+				error: dbError.message,
+			});
+			return;
+		}
+
+		// Respond with user details
+		res.status(201).json({
+			message: "User created successfully!",
+			user: {
+				id: user.id,
+				email: user.email,
+				username: name || null,
+			},
+		});
+	} catch (error: unknown) {
+		// Handle unexpected errors
+		res.status(500).json({
+			message: "An unexpected error occurred.",
+			error: error instanceof Error ? error.message : "Unknown error",
+		});
+	}
 };
 
 /**
- * Login a user with email and password, and fetch profile from PostgreSQL.
+ * Login a user with email and password, and fetch profile from Supabase database.
  * Ensures email verification before allowing access.
  * @param req - Express request object
  * @param res - Express response object
  */
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-    const { email, password } = req.body;
+	const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-        res.status(400).json({ message: "Email and password are required." });
-        return;
-    }
+	// Validate input
+	if (!email || !password) {
+		res.status(400).json({ message: "Email and password are required." });
+		return;
+	}
 
-    try {
-        // Authenticate user with Firebase Auth
-        const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
-        const user = userCredential.user;
+	try {
+		// Authenticate user with Supabase Auth
+		const { data: authData, error: authError } =
+			await supabase.auth.signInWithPassword({
+				email,
+				password,
+			});
 
-        // Check if email is verified
-        if (!user.emailVerified) {
-            res.status(403).json({
-                message:
-                    "Email not verified. Please verify your email before logging in.",
-            });
-            return;
-        }
+		if (authError) {
+			res.status(401).json({
+				message: "Login failed. Please check your email and password.",
+				error: authError.message,
+			});
+			return;
+		}
 
-        // Get Firebase ID Token
-        const idToken = await user.getIdToken();
+		const { user } = authData;
 
-        // Fetch user profile from PostgreSQL
-        const query = "SELECT * FROM users WHERE firebase_uid = $1";
-        const values = [user.uid];
-        const result = await pool.query(query, values);
+		if (!user) {
+			res.status(500).json({
+				message: "Login succeeded, but user data is missing.",
+			});
+			return;
+		}
 
-        if (result.rows.length === 0) {
-            res.status(404).json({ message: "User profile not found." });
-            return;
-        }
+		// Ensure email is verified
+		if (!user.email_confirmed_at) {
+			res.status(403).json({
+				message:
+					"Email not verified. Please verify your email before logging in.",
+			});
+			return;
+		}
 
-        const userProfile = result.rows[0];
+		// Fetch user profile from Supabase database
+		const { data: userProfile, error: profileError } = await supabase
+			.from("users")
+			.select("*")
+			.eq("user_id", user.id)
+			.single();
 
-        // Respond with user details and profile
-        res.status(200).json({
-            message: "Login successful!",
-            token: idToken, // Firebase ID token
-            user: {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                profile: userProfile, // Include profile details from PostgreSQL
-            },
-        });
-    } catch (error: unknown) {
-        // Handle Firebase-specific errors
-        if (error instanceof FirebaseError) {
-            res.status(401).json({
-                message:
-                    "Login failed. Please check that your email and password are correct.",
-                errorCode: error.code,
-                errorMessage: error.message,
-            });
-        } else {
-            // Handle unexpected errors
-            res.status(500).json({
-                message: "An unexpected error occurred.",
-                error: error instanceof Error ? error.message : "Unknown error",
-            });
-        }
-    }
+		if (profileError || !userProfile) {
+			res.status(404).json({
+				message: "User profile not found.",
+				error: profileError?.message,
+			});
+			return;
+		}
+
+		// Respond with user details and profile
+		res.status(200).json({
+			message: "Login successful!",
+			user: {
+				id: user.id,
+				email: user.email,
+				username: userProfile.username,
+				account_type: userProfile.account_type,
+			},
+		});
+	} catch (error: unknown) {
+		// Handle unexpected errors
+		res.status(500).json({
+			message: "An unexpected error occurred.",
+			error: error instanceof Error ? error.message : "Unknown error",
+		});
+	}
 };

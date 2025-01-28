@@ -7,7 +7,7 @@ export const handlegenerateContent = async (
     res: Response
 ): Promise<void> => {
     try {
-        const format = req.body.format;
+        const formats = JSON.parse(req.body.formats);
         const tone = req.body.tone;
         const audience = req.body.audience;
         let transcript = req.body.transcript;
@@ -17,7 +17,9 @@ export const handlegenerateContent = async (
             const file = req.file;
 
             if (!file) {
-                res.status(400).send({ message: "No transcript or file provided!" });
+                res.status(400).send({
+                    message: "No transcript or file provided!",
+                });
                 return;
             }
 
@@ -30,14 +32,36 @@ export const handlegenerateContent = async (
             }
         }
 
-        // Generate content from the transcript and format
-        const content = await formatGPT(transcript, format, tone, audience);
+        const contentPromises =
+            formats?.map(async (format: string) => {
+                const result: string | null = await formatGPT(
+                    transcript,
+                    format,
+                    tone,
+                    audience
+                );
+                return { format, result }; // Include both format and result
+            }) ?? [];
 
-        // Respond with the transcript and formatted content
+        // Wait for all promises to resolve
+        const contentResults = await Promise.all(contentPromises);
+
+        // Transform the results into an object with nested objects
+        const content = contentResults.reduce((acc, { format, result }) => {
+            if (result !== null) {
+                acc[format] = {
+                    format, // Include the format name
+                    result, // Include the generated content
+                };
+            }
+            return acc;
+        }, {} as Record<string, { format: string; result: string }>);
+
+        // Send the response
         res.status(200).send({
             message: "Content generation successful!",
             transcript: transcript,
-            content: content,
+            content: content, // Use the populated content array
         });
     } catch (error) {
         console.error("Error during processing:", error);
