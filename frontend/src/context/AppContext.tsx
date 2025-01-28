@@ -1,11 +1,13 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { User } from "@supabase/supabase-js"; // Import types from Supabase
 
 interface AppContextType {
-	user: string | null;
-	setUser: (user: string | null) => void;
-	logout: () => void;
+	user: User | null; // Supabase User type
+	setUser: (user: User | null) => void;
+	logout: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -13,29 +15,31 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
-	const [user, setUser] = useState<string | null>(null);
+	const [user, setUser] = useState<User | null>(null);
 
-	// Restore user and token from localStorage on initialization
+	console.log("is user", user);
+
+	// Check session on initialization
 	useEffect(() => {
-		const savedUser = localStorage.getItem("user");
+		const fetchUser = async () => {
+			const {
+				data: { session },
+			} = await supabase.auth.getSession();
 
-		if (savedUser) {
-			setUser(JSON.parse(savedUser));
-		}
-	}, []);
+			if (session) {
+				setUser(session.user); // session.user is of type User
+			}
+		};
 
-	// Persist user to localStorage whenever it changes
-	useEffect(() => {
-		if (user) {
-			localStorage.setItem("user", JSON.stringify(user));
-		} else {
-			localStorage.removeItem("user");
+		if (!user) {
+			fetchUser();
 		}
 	}, [user]);
 
-	const logout = () => {
+	// Logout function
+	const logout = async () => {
+		await supabase.auth.signOut();
 		setUser(null);
-		localStorage.removeItem("user");
 	};
 
 	return (
