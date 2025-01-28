@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes";
 import contentRoutes from "./routes/contentRoutes"
 
 dotenv.config();
@@ -22,7 +21,6 @@ app.use(
 app.use(express.json({ limit: '1000mb' }));
 app.use(express.urlencoded({ limit: '1000mb', extended: true }));
 
-app.use("/api", userRoutes);
 app.use("/api", contentRoutes);
 
 app.listen(PORT, () => {
