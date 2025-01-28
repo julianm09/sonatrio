@@ -18,7 +18,7 @@ const LoginForm: React.FC = ({}) => {
 
     const [error, setError] = useState<string | null>(null);
 
-    const { user, setUser, setToken, logout } = useAppContext();
+    const { user, setUser, logout } = useAppContext();
     const router = useRouter();
 
     useEffect(() => {
@@ -43,12 +43,10 @@ const LoginForm: React.FC = ({}) => {
             setError(null);
 
             // Update the user and token in context
-            setUser(result.user.profile);
-            setToken(result.token);
+            setUser(result.user);
 
             // Persist user profile and token to localStorage
-            localStorage.setItem("user", JSON.stringify(result.user.profile));
-            localStorage.setItem("token", result.token);
+            localStorage.setItem("user", JSON.stringify(result.user));
 
             // Optionally redirect or perform other actions after login
         } catch (err) {

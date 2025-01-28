@@ -1,42 +1,29 @@
-.container-label {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .label {
-        font-size: 17px;
-        font-weight: 500;
-    }
-
-    .actions {
-        display: flex;
-        gap: 30px;
-        align-items: center;
-
-        .copy,
-        .save {
-            cursor: pointer;
-            transition: color 0.3s;
-            display: flex;
-
-            &:hover {
-                color: #ac93ff;
-            }
-        }
-    }
-}
-
 .output-container {
     overflow-y: scroll;
     font-family: Arial, sans-serif;
     line-height: 1.8;
-    padding: 40px;
-    background-color: #1e1e1e; /* Dark background */
+    padding: 100px 0;
+    background-color: #1c1c1c; /* Dark background */
     color: #f5f5f5; /* Light text for readability */
     border: 1px solid #333; /* Subtle border */
     width: 100%;
     height: calc(100vh - 140px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    .output {
+        width: 800px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .content-container {
+        background: #222;
+        padding: 40px;
+        border-radius: 20px;
+    }
 
     h1,
     h2,
