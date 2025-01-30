@@ -33,7 +33,7 @@ export const formatGPT = async (
             "tutorial": `Write a step-by-step tutorial: ${transcript}`,
             "transcript": `Format the following into readable paragraphs without changing wording or punctuation: ${transcript}`,
             "study-guide": `Create a concise and structured study guide: ${transcript}`,
-            "summary": `Create a concise summary that highlights the main ideas, key points, and essential takeaways from the following transcript: ${transcript}`,
+            "summary": `Create a detailed summary that highlights the main ideas, key points, quotes and essential takeaways from the following transcript: ${transcript}`,
             "website-copy": `Craft clear, engaging, and professional website copy using the following information. Provide detailed instructions for where and how the content should be placed on the website:
     
             1. **Homepage**: Write an attention-grabbing headline and a brief introductory paragraph that highlights the key message or purpose of the website.

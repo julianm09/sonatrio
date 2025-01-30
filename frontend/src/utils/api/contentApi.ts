@@ -1,31 +1,50 @@
 import axios from "axios";
+import { getAuthToken } from "./authToken";
 
 const API_BASE_URL = "http://localhost:8000";
 
-export const transcribeFile = async (formData: FormData) => {
-    const response = await axios.post(
-        `${API_BASE_URL}/api/content/transcribe`,
-        formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-    );
-
-    return response.data;
-};
-
+// Generate content with Supabase token attached
 export const generateContent = async (formData: FormData) => {
-    const response = await axios.post(
-        `${API_BASE_URL}/api/content/generate`,
-        formData,
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-    );
+	try {
+		// Get the auth token
+		const token = await getAuthToken();
 
-    return response.data;
+		if (!token) {
+			throw new Error("User is not authenticated. Unable to proceed.");
+		}
+
+		// Make the API call with the token in the headers
+		const response = await axios.post(
+			`${API_BASE_URL}/api/content/generate`,
+			formData,
+			{
+				headers: {
+					"Content-Type": "multipart/form-data",
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		);
+
+		return response.data;
+	} catch (err) {
+		if (axios.isAxiosError(err)) {
+			// Axios-specific error
+			console.error(
+				"Error generating content:",
+				err.response?.data || err.message
+			);
+			throw new Error(
+				err.response?.data?.message ||
+					"Failed to generate content. Please try again."
+			);
+		} else if (err instanceof Error) {
+			// Generic JavaScript error
+			console.error("Error generating content:", err.message);
+			throw new Error(err.message);
+		} else {
+			// Unknown error
+			console.error("Unknown error generating content:", err);
+			throw new Error("An unknown error occurred. Please try again.");
+		}
+	}
 };

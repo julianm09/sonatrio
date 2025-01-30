@@ -6,13 +6,13 @@ import TextInput from "../TextInput/TextInput";
 import LabelHeader from "../LabelHeader/LabelHeader";
 import SubmitButton from "../SubmitButton/SubmitButton";
 import { supabase } from "@/lib/supabaseClient";
-import { useAppContext } from "@/context/AppContext";
+import { useUserContext } from "@/context/UserContext";
 
 const LoginForm: React.FC = ({}) => {
 	const [formData, setFormData] = useState({
 		name: "",
-		email: "",
-		password: "",
+		email: "julianmayes@gmail.com",
+		password: "Okayseeyou2020!",
 	});
 
 	const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const LoginForm: React.FC = ({}) => {
 
 	const router = useRouter();
 
-	const { user, setUser } = useAppContext();
+	const { user, setUser } = useUserContext();
 
 	useEffect(() => {
 		console.log(user);

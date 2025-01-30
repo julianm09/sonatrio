@@ -6,24 +6,18 @@ import ContentInput from "../ContentInput/ContentInput";
 import axios from "axios";
 import { generateContent } from "@/utils/api/contentApi";
 import ContentSettings from "../ContentSettings/ContentSettings";
-
-interface ContentValue {
-	format: string;
-	result: string;
-}
-
-type Content = Record<string, ContentValue>;
+import { useMessageContext } from "@/context/MessageContext";
 
 const FileConverter: React.FC = ({}) => {
 	const [file, setFile] = useState<File | null>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const [transcript, setTranscript] = useState<string | null>(null);
 	const [converting, setConverting] = useState(false);
-	const [copied, setCopied] = useState(false);
 	const [openSettings, setOpenSettings] = useState(false);
 	const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
-	const [content, setContent] = useState<Content>({});
 	const [errorText, setErrorText] = useState<string | null>(null);
+
+	const { currentConversation, setCurrentConversation } = useMessageContext();
 
 	const handleToggleSettings = () => {
 		setOpenSettings(!openSettings);
@@ -51,9 +45,10 @@ const FileConverter: React.FC = ({}) => {
 
 		const formData = new FormData();
 
-		if (transcript) {
+		if (transcript && file) {
 			formData.append("transcript", transcript);
-		} else if (file) {
+			formData.append("file", file);
+		} else if (!transcript && file) {
 			formData.append("file", file);
 		}
 
@@ -61,13 +56,17 @@ const FileConverter: React.FC = ({}) => {
 		formData.append("tone", contentSettings.tone);
 		formData.append("audience", contentSettings.audience);
 
+		if (currentConversation) {
+			formData.append("conversation_id", currentConversation);
+		}
+
 		setConverting(true);
-        setErrorText(null)
+		setErrorText(null);
 
 		try {
 			const response = await generateContent(formData);
 
-			setContent(response.content);
+			setCurrentConversation(response.conversationId);
 
 			if (response.transcript) {
 				setTranscript(response.transcript);
@@ -111,14 +110,7 @@ const FileConverter: React.FC = ({}) => {
 				setSelectedFormats={setSelectedFormats}
 			/>
 
-			<ContentDisplay
-				converting={converting}
-				setCopied={setCopied}
-				copied={copied}
-				handleConversion={handleConversion}
-				content={content}
-                errorText={errorText}
-			/>
+			<ContentDisplay converting={converting} errorText={errorText} />
 		</div>
 	);
 };
