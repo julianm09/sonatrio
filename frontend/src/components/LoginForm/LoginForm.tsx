@@ -11,8 +11,8 @@ import { useUserContext } from "@/context/UserContext";
 const LoginForm: React.FC = ({}) => {
 	const [formData, setFormData] = useState({
 		name: "",
-		email: "julianmayes@gmail.com",
-		password: "Okayseeyou2020!",
+		email: "",
+		password: "",
 	});
 
 	const [loading, setLoading] = useState(false);

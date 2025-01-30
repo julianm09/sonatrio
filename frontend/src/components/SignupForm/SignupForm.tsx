@@ -11,9 +11,9 @@ import SubmitButton from "../SubmitButton/SubmitButton";
 
 const SignupForm: React.FC = () => {
 	const [formData, setFormData] = useState({
-		name: "Julian",
-		email: "julianmayes@gmail.com",
-		password: "Okayseeyou2020!",
+		name: "",
+		email: "",
+		password: "",
 	});
 
 	const [verifyPassword, setVerifyPassword] = useState("Okayseeyou2020!");
