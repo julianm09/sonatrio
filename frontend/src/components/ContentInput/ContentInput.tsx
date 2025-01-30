@@ -86,13 +86,10 @@ const ContentInput: React.FC<ContentInputProps> = ({
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}
 			>
-				<label htmlFor="file-input">
-					<Paperclip size={18} />
-				</label>
-
-				<div>
+				<div className={styles["settings"]}>
 					<Settings size={18} onClick={handleToggleSettings} />
 				</div>
+
 				<input
 					type="file"
 					onChange={handleFileInput}
@@ -113,21 +110,21 @@ const ContentInput: React.FC<ContentInputProps> = ({
 					{file ? (
 						<p>{file.name}</p>
 					) : (
-						<p>Drop your video here, or click to select one.</p>
+						<>
+							<p>Drop a file here, or click to select one.</p>
+							<div className={styles["icon"]}>
+								<Paperclip size={18} />
+							</div>
+						</>
 					)}
 				</label>
 
-				{/* <Dropdown
-                    options={options}
-                    value={selectedFormat}
-                    onChange={handleFormatChange}
-                    placeholder="Choose an output format"
-                /> */}
 				<MultiSelectDropdown
 					options={options}
 					onChange={handleSelectionChange}
 					selectedFormats={selectedFormats}
 					setSelectedFormats={setSelectedFormats}
+					converting={converting}
 				/>
 
 				<ActionButton

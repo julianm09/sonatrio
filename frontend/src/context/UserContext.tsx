@@ -4,15 +4,15 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { User } from "@supabase/supabase-js"; // Import types from Supabase
 
-interface AppContextType {
+interface UserContextType {
 	user: User | null; // Supabase User type
 	setUser: (user: User | null) => void;
 	logout: () => Promise<void>;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
+export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
 	children,
 }) => {
 	const [user, setUser] = useState<User | null>(null);
@@ -43,17 +43,17 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
 	};
 
 	return (
-		<AppContext.Provider value={{ user, setUser, logout }}>
+		<UserContext.Provider value={{ user, setUser, logout }}>
 			{children}
-		</AppContext.Provider>
+		</UserContext.Provider>
 	);
 };
 
-export const useAppContext = () => {
-	const context = useContext(AppContext);
+export const useUserContext = () => {
+	const context = useContext(UserContext);
 	if (!context) {
 		throw new Error(
-			"useAppContext must be used within an AppContextProvider"
+			"useUserContext must be used within an UserContextProvider"
 		);
 	}
 	return context;

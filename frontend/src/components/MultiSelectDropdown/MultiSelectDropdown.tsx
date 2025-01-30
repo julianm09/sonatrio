@@ -1,5 +1,5 @@
 // File: components/MultiSelectDropdown.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./MultiSelectDropdown.module.scss";
 import { ChevronDown, ChevronUp } from "react-feather";
 
@@ -13,6 +13,7 @@ type MultiSelectDropdownProps = {
 	onChange: (selected: string[]) => void;
 	selectedFormats: string[];
 	setSelectedFormats: React.Dispatch<React.SetStateAction<string[]>>;
+	converting: boolean;
 };
 
 const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
@@ -20,6 +21,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 	setSelectedFormats,
 	options,
 	onChange,
+	converting,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -34,13 +36,19 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 		onChange(updatedSelection);
 	};
 
+	useEffect(() => {
+		if (converting) {
+			setIsOpen(false);
+		}
+	}, [converting]);
+
 	return (
 		<div className={styles["dropdown"]}>
 			<div className={styles["header"]} onClick={toggleDropdown}>
 				<span>
 					{selectedFormats.length > 0
 						? `${selectedFormats.length} selected`
-						: "Select options"}
+						: "Format"}
 				</span>
 				<div className={styles["caret"]}>
 					{isOpen ? (

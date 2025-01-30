@@ -1,10 +1,10 @@
 import { useState } from "react";
 import styles from "./Navbar.module.scss";
 import { Menu } from "react-feather";
-import { useAppContext } from "@/context/AppContext";
+import { useUserContext } from "@/context/UserContext";
 
 const Navbar = () => {
-    const { user, logout } = useAppContext();
+    const { user, logout } = useUserContext();
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -14,7 +14,6 @@ const Navbar = () => {
 
     return (
         <nav className={styles["navbar"]}>
-            <div className={styles["logo"]}>sonatrio</div>
             <button
                 className={styles["hamburger"]}
                 onClick={toggleNavbar}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import styles from "./SignupForm.module.scss";
 import { supabase } from "@/lib/supabaseClient"; // Import your Supabase client
-import { useAppContext } from "@/context/AppContext";
+import { useUserContext } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import TextInput from "../TextInput/TextInput";
 import LabelHeader from "../LabelHeader/LabelHeader";
@@ -16,11 +16,11 @@ const SignupForm: React.FC = () => {
 		password: "",
 	});
 
-	const [verifyPassword, setVerifyPassword] = useState("");
+	const [verifyPassword, setVerifyPassword] = useState("Okayseeyou2020!");
 	const [error, setError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	const { user } = useAppContext();
+	const { user } = useUserContext();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -48,7 +48,8 @@ const SignupForm: React.FC = () => {
 		}
 
 		try {
-			const { error } = await supabase.auth.signUp({
+			// Sign up the user
+			const { data, error } = await supabase.auth.signUp({
 				email: formData.email,
 				password: formData.password,
 				options: {
@@ -62,6 +63,33 @@ const SignupForm: React.FC = () => {
 				throw new Error(error.message);
 			}
 
+			const user = data.user;
+			if (!user) {
+				throw new Error(
+					"User registration successful but no user data returned."
+				);
+			}
+
+			// Create profile in the profiles table
+			const { error: profileError } = await supabase
+				.from("profiles") // Replace with your table name
+				.insert([
+					{
+						user_id: user.id, // User ID from Supabase
+						email: formData.email,
+						name: formData.name,
+						tier: "free", // Default user tier
+						created_at: new Date().toISOString(),
+					},
+				]);
+
+			if (profileError) {
+				throw new Error(
+					`Profile creation failed: ${profileError.message}`
+				);
+			}
+
+			// Success message
 			setSuccessMessage("Account created! Check your email to confirm.");
 			setError(null);
 		} catch (err) {

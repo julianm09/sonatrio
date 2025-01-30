@@ -1,60 +1,93 @@
 import React, { useState } from "react";
 import styles from "./SideNavbar.module.scss";
-import {
-    Home,
-    Settings,
-    User,
-    LogIn,
-    Sidebar,
-    LogOut,
-} from "react-feather";
-import { useAppContext } from "@/context/AppContext";
+import { User, LogIn, Sidebar, LogOut, Edit } from "react-feather";
+import { useUserContext } from "@/context/UserContext";
 import Link from "next/link";
+import Conversations from "../Conversations/Conversations";
+import { useMessageContext } from "@/context/MessageContext";
 
 const SideNavbar: React.FC = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+	const [isCollapsed, setIsCollapsed] = useState(false);
 
-    const toggleNavbar = () => setIsCollapsed(!isCollapsed);
+	const toggleNavbar = () => setIsCollapsed(!isCollapsed);
 
-    const { user, logout } = useAppContext();
+	const { user, logout } = useUserContext();
+	const { setCurrentConversation } = useMessageContext();
 
-    return (
-        <div
-            className={`${styles.sidebar} ${
-                isCollapsed ? styles.collapsed : ""
-            }`}
-        >
-            <ul className={styles.navList}>
-                <li className={styles.navItem} onClick={toggleNavbar}>
-                    <Sidebar size={20} />
-                </li>
-                <Link className={styles.navItem} href="/">
-                    <Home size={20} />
-                    {!isCollapsed && <span>Home</span>}
-                </Link>
-                <li className={styles.navItem}>
-                    <User size={20} />
-                    {!isCollapsed && <span>Profile</span>}
-                </li>
-                <li className={styles.navItem}>
-                    <Settings size={20} />
-                    {!isCollapsed && <span>Settings</span>}
-                </li>
+	const handleNewConversation = () => {
+		setCurrentConversation(null);
+	};
 
-                {user ? (
-                    <li className={styles.navItem} onClick={logout}>
-                        <LogOut size={20} />
-                        {!isCollapsed && <span>Sign Out</span>}
-                    </li>
-                ) : (
-                    <Link className={styles.navItem} href="/login">
-                        <LogIn size={20} />
-                        {!isCollapsed && <span>Login</span>}
-                    </Link>
-                )}
-            </ul>
-        </div>
-    );
+	return (
+		<div className={styles["container"]}>
+			<div
+				className={`${styles["collapse-button"]} ${
+					isCollapsed ? styles["hidden"] : ""
+				}`}
+				onClick={toggleNavbar}
+				style={{ cursor: "pointer" }}
+			>
+				<Sidebar size={18} />
+			</div>
+
+			<div
+				className={`${styles["sidebar"]} ${
+					isCollapsed ? styles.collapsed : ""
+				}`}
+			>
+				<div className={styles["navList"]}>
+					<div
+						className={styles["navItem"]}
+						onClick={toggleNavbar}
+						style={{ cursor: "pointer" }}
+					>
+						<Sidebar size={18} />
+					</div>
+					<div
+						className={styles["navItem"]}
+						onClick={handleNewConversation}
+						style={{ cursor: "pointer" }}
+					>
+						<Edit size={18} />
+						{!isCollapsed && <span>New Session</span>}
+					</div>
+					<div
+						className={styles["navItem"]}
+						style={{ cursor: "pointer" }}
+					>
+						<User size={18} />
+						{!isCollapsed && <span>Profile</span>}
+					</div>
+
+					{user ? (
+						<div
+							className={styles["navItem"]}
+							onClick={logout}
+							style={{ cursor: "pointer" }}
+						>
+							<LogOut size={18} />
+							{!isCollapsed && <span>Sign Out</span>}
+						</div>
+					) : (
+						<Link
+							className={styles["navItem"]}
+							href="/login"
+							style={{ cursor: "pointer" }}
+						>
+							<LogIn size={18} />
+							{!isCollapsed && <span>Login</span>}
+						</Link>
+					)}
+				</div>
+				{user && (
+					<Conversations
+						userId={user?.id}
+						isCollapsed={isCollapsed}
+					/>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default SideNavbar;
