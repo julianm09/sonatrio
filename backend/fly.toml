@@ -14,7 +14,8 @@ primary_region = 'sea'
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+  processes = ["app"]
+  command = "node backend/dist/fly.js"
 
 [[vm]]
   memory = '1gb'
