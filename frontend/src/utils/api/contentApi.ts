@@ -1,8 +1,6 @@
 import axios from "axios";
 import { getAuthToken } from "./authToken";
 
-const API_BASE_URL = "http://localhost:8000";
-
 // Generate content with Supabase token attached
 export const generateContent = async (formData: FormData) => {
 	try {
@@ -15,7 +13,7 @@ export const generateContent = async (formData: FormData) => {
 
 		// Make the API call with the token in the headers
 		const response = await axios.post(
-			`${API_BASE_URL}/api/content/generate`,
+			`https://sonatrio-cjckqw.fly.dev/api/content/generate`,
 			formData,
 			{
 				headers: {

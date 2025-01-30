@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
 	cors({
-		origin: "http://localhost:3000", // Replace with your frontend's URL
+		origin: "https://sonatrio.vercel.app", // Replace with your frontend's URL
 		methods: ["GET", "POST"],
 		credentials: true,
 	})
