@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { transcribeFile } from "../services/transcribeFile";
 import { formatGPT } from "../services/formatGPT";
 import { supabase } from "../utils/supabase";
+import { getAudioCreditsFFmpeg } from "../services/getAudioCreditsFFmpeg";
+import { updateCredits } from "../services/updateCredits";
 
 export const handlegenerateContent = async (
 	req: Request,
@@ -29,11 +31,26 @@ export const handlegenerateContent = async (
 		const user = data.user; // Now `user` is of type `User`
 
 		// Extract inputs from the request body
-		const formats = JSON.parse(req.body.formats);
-		const tone = req.body.tone;
-		const audience = req.body.audience;
-		let transcript = req.body.transcript;
+		const formats: string[] = JSON.parse(req.body.formats);
+		const tone: string = req.body.tone;
+		const audience: string = req.body.audience;
+		let transcript: string | null = req.body.transcript;
+		const keywords: string[] = JSON.parse(req.body.keywords);
 		const file = req.file;
+
+		if (file && user) {
+			const creditCost = await getAudioCreditsFFmpeg(
+				file.buffer,
+				file.originalname
+			);
+
+			// ✅ Deduct 1 credit for the transcription
+			const creditUpdate = await updateCredits(user.id, creditCost); // Adjust credit usage
+
+			if (creditUpdate.error) {
+				res.status(500).json({ error: "Failed to update credits" });
+			}
+		}
 
 		const fileName = file?.originalname;
 
@@ -48,7 +65,7 @@ export const handlegenerateContent = async (
 						{
 							user_id: user.id, // Link conversation to the user
 							created_at: new Date().toISOString(),
-                            name: fileName
+							name: fileName,
 						},
 					])
 					.select("id")
@@ -93,7 +110,8 @@ export const handlegenerateContent = async (
 					transcript,
 					format,
 					tone,
-					audience
+					audience,
+					keywords
 				);
 				return { format, result }; // Include both format and result
 			}) ?? [];

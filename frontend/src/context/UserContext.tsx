@@ -17,8 +17,6 @@ export const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 	const [user, setUser] = useState<User | null>(null);
 
-	console.log("is user", user);
-
 	// Check session on initialization
 	useEffect(() => {
 		const fetchUser = async () => {

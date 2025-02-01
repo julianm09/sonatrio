@@ -9,6 +9,8 @@
     background: #222;
     padding: 40px;
     border-radius: 20px;
+    display: flex;
+    flex-direction: column;
 
     @media only screen and (max-width: 800px) {
         border-radius: 0px;

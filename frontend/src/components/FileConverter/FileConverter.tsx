@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import styles from "./FileConverter.module.scss";
 import ContentDisplay from "../ContentDisplay/ContentDisplay";
 import ContentInput from "../ContentInput/ContentInput";
-import axios from "axios";
 import { generateContent } from "@/utils/api/contentApi";
 import ContentSettings from "../ContentSettings/ContentSettings";
 import { useMessageContext } from "@/context/MessageContext";
+import { useUserContext } from "@/context/UserContext";
 
 const FileConverter: React.FC = ({}) => {
 	const [file, setFile] = useState<File | null>(null);
@@ -19,6 +19,8 @@ const FileConverter: React.FC = ({}) => {
 
 	const { currentConversation, setCurrentConversation } = useMessageContext();
 
+	const { user } = useUserContext();
+
 	const handleToggleSettings = () => {
 		setOpenSettings(!openSettings);
 	};
@@ -26,6 +28,7 @@ const FileConverter: React.FC = ({}) => {
 	const [contentSettings, setContentSettings] = useState({
 		tone: "",
 		audience: "",
+		keywords: [] as string[],
 	});
 
 	// Reset transcription when new file is selected
@@ -52,36 +55,36 @@ const FileConverter: React.FC = ({}) => {
 			formData.append("file", file);
 		}
 
+		if (user) {
+			formData.append("user", user.id);
+		}
+
 		formData.append("formats", JSON.stringify(selectedFormats));
 		formData.append("tone", contentSettings.tone);
 		formData.append("audience", contentSettings.audience);
+		formData.append("keywords", JSON.stringify(contentSettings.keywords));
 
 		if (currentConversation) {
 			formData.append("conversation_id", currentConversation);
 		}
 
 		setConverting(true);
-		setErrorText(null);
+		setErrorText(null); // Reset error state before request
 
-		try {
-			const response = await generateContent(formData);
+		// ✅ Call API and handle error response properly
+		const response = await generateContent(formData);
 
-			setCurrentConversation(response.conversationId);
+		if (response.error) {
+			setErrorText(response.error); // ✅ Set error from API response
+			setConverting(false);
+			return;
+		}
 
-			if (response.transcript) {
-				setTranscript(response.transcript);
-			}
-		} catch (error) {
-			console.error("Error during conversion:", error);
+		// ✅ Success: Process response
+		setCurrentConversation(response.conversationId);
 
-			if (axios.isAxiosError(error)) {
-				setErrorText(
-					error.response?.data?.message ||
-						"An error occurred during content conversion."
-				);
-			} else {
-				setErrorText("An unexpected error occurred.");
-			}
+		if (response.transcript) {
+			setTranscript(response.transcript);
 		}
 
 		setConverting(false);
@@ -97,6 +100,12 @@ const FileConverter: React.FC = ({}) => {
 				/>
 			)}
 
+			<ContentDisplay
+				converting={converting}
+				errorText={errorText}
+				setErrorText={setErrorText}
+			/>
+
 			<ContentInput
 				file={file}
 				setFile={setFile}
@@ -109,8 +118,6 @@ const FileConverter: React.FC = ({}) => {
 				selectedFormats={selectedFormats}
 				setSelectedFormats={setSelectedFormats}
 			/>
-
-			<ContentDisplay converting={converting} errorText={errorText} />
 		</div>
 	);
 };

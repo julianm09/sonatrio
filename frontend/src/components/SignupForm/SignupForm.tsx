@@ -72,7 +72,7 @@ const SignupForm: React.FC = () => {
 
 			// Create profile in the profiles table
 			const { error: profileError } = await supabase
-				.from("profiles") // Replace with your table name
+				.from("users") // Replace with your table name
 				.insert([
 					{
 						user_id: user.id, // User ID from Supabase

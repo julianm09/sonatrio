@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL_LOCAL } from "./contentApi";
 
 export const fetchMessages = async (conversationId: string) => {
 	try {
-		const response = await axios.get(`https://sonatrio-cjckqw.fly.dev/api/messages`, {
+		const response = await axios.get(`${API_BASE_URL_LOCAL}/api/messages`, {
 			params: { conversationId },
 		});
 		return response.data;

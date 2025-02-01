@@ -4,6 +4,7 @@ import styles from "./ContentInput.module.scss";
 import React, { ChangeEvent } from "react";
 import ActionButton from "../ActionButton/ActionButton";
 import MultiSelectDropdown from "../MultiSelectDropdown/MultiSelectDropdown";
+import { useUserContext } from "@/context/UserContext";
 
 interface ContentInputProps {
 	file: File | null;
@@ -24,18 +25,13 @@ type Option = {
 };
 
 const options: Option[] = [
+	{ value: "instagram-post", label: "Instagram Post" },
+	{ value: "linkedin-post", label: "LinkedIn Post" },
 	{ value: "blog-post", label: "Blog Post" },
 	{ value: "ad-copy", label: "Ad Copy" },
-	{ value: "instagram-post", label: "Instagram Post" },
-	{ value: "facebook-post", label: "Facebook Post" },
-	{ value: "tiktok-script", label: "Tiktok Script" },
-	{ value: "youtube-script", label: "Youtube Script" },
-	{ value: "linkedin-post", label: "LinkedIn Post" },
-	{ value: "tutorial", label: "Tutorial" },
-	{ value: "study-guide", label: "Study Guide" },
-	{ value: "transcript", label: "Transcript" },
 	{ value: "summary", label: "Summary" },
 	{ value: "website-copy", label: "Website Copy" },
+	{ value: "transcript", label: "Transcript" },
 ];
 
 const ContentInput: React.FC<ContentInputProps> = ({
@@ -49,6 +45,8 @@ const ContentInput: React.FC<ContentInputProps> = ({
 	selectedFormats,
 	setSelectedFormats,
 }) => {
+	const { user } = useUserContext();
+
 	const handleFileInput = async (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			setFile(e.target.files[0]);
@@ -64,7 +62,7 @@ const ContentInput: React.FC<ContentInputProps> = ({
 		setIsDragging(false);
 	};
 
-	const handleDrop = (e: React.DragEvent) => {
+	const handleDrop = async (e: React.DragEvent) => {
 		e.preventDefault();
 		setIsDragging(false);
 
@@ -72,10 +70,6 @@ const ContentInput: React.FC<ContentInputProps> = ({
 			setFile(e.dataTransfer.files[0]);
 			e.dataTransfer.clearData();
 		}
-	};
-
-	const handleSelectionChange = (selected: string[]) => {
-		console.log("Selected options:", selected);
 	};
 
 	return (
@@ -121,7 +115,6 @@ const ContentInput: React.FC<ContentInputProps> = ({
 
 				<MultiSelectDropdown
 					options={options}
-					onChange={handleSelectionChange}
 					selectedFormats={selectedFormats}
 					setSelectedFormats={setSelectedFormats}
 					converting={converting}
@@ -129,7 +122,12 @@ const ContentInput: React.FC<ContentInputProps> = ({
 
 				<ActionButton
 					onClick={handleConversion}
-					disabled={converting}
+					disabled={
+						converting ||
+						!user ||
+						!file ||
+						selectedFormats.length === 0
+					}
 					label={
 						converting ? (
 							<span className={styles["loader"]}></span>

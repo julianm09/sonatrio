@@ -1,6 +1,9 @@
 import axios from "axios";
 import { getAuthToken } from "./authToken";
 
+export const API_BASE_URL_LOCAL = "http://localhost:8000";
+export const API_BASE_URL = "https://sonatrio-cjckqw.fly.dev";
+
 // Generate content with Supabase token attached
 export const generateContent = async (formData: FormData) => {
 	try {
@@ -13,7 +16,7 @@ export const generateContent = async (formData: FormData) => {
 
 		// Make the API call with the token in the headers
 		const response = await axios.post(
-			`https://sonatrio-cjckqw.fly.dev/api/content/generate`,
+			`${API_BASE_URL_LOCAL}/api/content/generate`,
 			formData,
 			{
 				headers: {
@@ -25,24 +28,22 @@ export const generateContent = async (formData: FormData) => {
 
 		return response.data;
 	} catch (err) {
+		// Handle Axios-specific errors
 		if (axios.isAxiosError(err)) {
-			// Axios-specific error
-			console.error(
-				"Error generating content:",
-				err.response?.data || err.message
-			);
-			throw new Error(
-				err.response?.data?.message ||
-					"Failed to generate content. Please try again."
-			);
-		} else if (err instanceof Error) {
-			// Generic JavaScript error
-			console.error("Error generating content:", err.message);
-			throw new Error(err.message);
-		} else {
-			// Unknown error
-			console.error("Unknown error generating content:", err);
-			throw new Error("An unknown error occurred. Please try again.");
+			return {
+				error:
+					err.response?.data?.error ||
+					"Failed to generate content. Please try again.",
+				status: err.response?.status || 500, // Include HTTP status code
+			};
 		}
+
+		// Handle generic JavaScript errors
+		if (err instanceof Error) {
+			return { error: err.message };
+		}
+
+		// Handle unknown errors
+		return { error: "An unknown error occurred. Please try again." };
 	}
 };
