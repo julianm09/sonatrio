@@ -12,7 +12,7 @@ export const formatGPT = async (
 		let basePrompt = `Convert the following transcript`;
 		if (audience) basePrompt += ` for a ${audience} audience`;
 		if (format)
-			basePrompt += `. The format should be a ${format}. With few emojis`;
+			basePrompt += `. The format should be a ${format}`;
 
 		if (tone) {
 			if (tone === "original-source") {
