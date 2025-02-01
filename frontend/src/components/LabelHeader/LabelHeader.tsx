@@ -9,12 +9,19 @@ interface LabelHeaderProps {
 		onClick: () => void; // The action's click handler
 		label?: string; // Optional label for the action (e.g., "Copied to clipboard!")
 	}[];
+	white?: boolean;
 }
 
-const LabelHeader: React.FC<LabelHeaderProps> = ({ label, actions }) => {
+const LabelHeader: React.FC<LabelHeaderProps> = ({
+	label,
+	actions,
+	white = true,
+}) => {
 	return (
 		<div className={styles["container-label"]}>
-			<div className={styles["label"]}>{label}</div>
+			<div className={`${styles["label"]} ${white && styles["white"]}`}>
+				{label}
+			</div>
 			<div className={styles["actions"]}>
 				{actions?.map((action, index) => (
 					<div

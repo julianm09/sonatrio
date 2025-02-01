@@ -9,15 +9,17 @@ interface MessageContextType {
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
 
-export const MessageContextProvider: React.FC<{ children: React.ReactNode }> = ({
-	children,
-}) => {
-	const [currentConversation, setCurrentConversation] = useState<string | null>(null);
-
-	console.log("is user", currentConversation);
+export const MessageContextProvider: React.FC<{
+	children: React.ReactNode;
+}> = ({ children }) => {
+	const [currentConversation, setCurrentConversation] = useState<
+		string | null
+	>(null);
 
 	return (
-		<MessageContext.Provider value={{ currentConversation, setCurrentConversation }}>
+		<MessageContext.Provider
+			value={{ currentConversation, setCurrentConversation }}
+		>
 			{children}
 		</MessageContext.Provider>
 	);

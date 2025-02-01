@@ -10,7 +10,6 @@ type Option = {
 
 type MultiSelectDropdownProps = {
 	options: Option[];
-	onChange: (selected: string[]) => void;
 	selectedFormats: string[];
 	setSelectedFormats: React.Dispatch<React.SetStateAction<string[]>>;
 	converting: boolean;
@@ -20,7 +19,6 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 	selectedFormats,
 	setSelectedFormats,
 	options,
-	onChange,
 	converting,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +31,6 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 			: [...selectedFormats, value];
 
 		setSelectedFormats(updatedSelection);
-		onChange(updatedSelection);
 	};
 
 	useEffect(() => {

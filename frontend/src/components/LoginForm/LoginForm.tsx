@@ -23,7 +23,6 @@ const LoginForm: React.FC = ({}) => {
 	const { user, setUser } = useUserContext();
 
 	useEffect(() => {
-		console.log(user);
 		if (user) {
 			router.push("/"); // Redirect to home page if signed in
 		}
@@ -49,8 +48,6 @@ const LoginForm: React.FC = ({}) => {
 			});
 
 			if (error) throw new Error(error.message); // Convert to a generic Error
-
-			console.log("User data:", data);
 
 			setUser(data.user); // Set the user from the response
 		} catch (err: unknown) {

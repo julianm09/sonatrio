@@ -29,12 +29,12 @@
 	.menu {
 		background: #333;
 		position: absolute;
-		top: -180px;
-		max-height: 200px;
+		top: -230px;
+		max-height: 300px;
 		overflow-y: auto;
-		border: 1px solid #ccc;
-		border-radius: 10px;
-		width: 300px;
+		border: 1px solid #666;
+		border-radius: 5px;
+		width: 340px;
 		z-index: 99;
 
 		.option {
