@@ -6,6 +6,8 @@ import conversationsRoutes from "./routes/conversationsRoutes";
 import messagesRoutes from "./routes/messagesRoutes";
 import testRoutes from "./routes/test";
 import startCronJobs from "./cron/scheduler";
+import stripeRoutes from "./routes/stripeRoutes"
+import webhookRoutes from "./routes/webhookRoutes"
 
 dotenv.config();
 
@@ -15,8 +17,6 @@ const PORT = process.env.PORT || 3000;
 const prod = "https://sonatrio-julian-mayes-projects.vercel.app";
 const local = "http://localhost:3000";
 
-//middleware
-app.use(express.json());
 app.use(
 	cors({
 		origin: local, // Frontend URL - No trailing slash
@@ -25,13 +25,17 @@ app.use(
 	})
 );
 
-app.use(express.json({ limit: "1000mb" }));
-app.use(express.urlencoded({ limit: "1000mb", extended: true }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
+app.use("/api", webhookRoutes);
+
+app.use(express.json({ limit: "10mb" }));
 
 app.use("/api", contentRoutes);
 app.use("/api", conversationsRoutes);
 app.use("/api", messagesRoutes);
 app.use("/test", testRoutes);
+app.use("/api", stripeRoutes);
 
 // ✅ Start cron jobs
 startCronJobs();

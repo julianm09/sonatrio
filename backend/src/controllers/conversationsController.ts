@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { transcribeFile } from "../services/transcribeFile";
-import { formatGPT } from "../services/formatGPT";
 import { supabase } from "../utils/supabase";
 
 export const getUserConversations = async (

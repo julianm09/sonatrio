@@ -45,7 +45,7 @@ Ensure you have the following installed:
 For detailed API usage and configuration, check out the [Wiki](https://github.com/your-repo/sonatrio/wiki).
 
 ## 🛠️ Tech Stack
-- **Frontend:** TypeScript, React, TailwindCSS
+- **Frontend:** Next JS
 - **Backend:** Express.js, Supabase
 - **AI Services:** Deepgram for transcription, GPT for content generation
 

@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    flex-direction: column;
+
+    button {
+        margin-top: 20px;
+        padding: 10px;
+        cursor: pointer;
+    }
+}

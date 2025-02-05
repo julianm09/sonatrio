@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styles from "./SideNavbar.module.scss";
-import { User, LogIn, Sidebar, LogOut, Edit } from "react-feather";
+import { User, LogIn, Sidebar, LogOut, Edit, DollarSign } from "react-feather";
 import { useUserContext } from "@/context/UserContext";
 import Link from "next/link";
 import Conversations from "../Conversations/Conversations";
@@ -51,13 +51,22 @@ const SideNavbar: React.FC = () => {
 						<Edit size={18} />
 						{!isCollapsed && <span>New Session</span>}
 					</div>
-					<div
+					<Link
 						className={styles["navItem"]}
 						style={{ cursor: "pointer" }}
+						href={"/pricing"}
 					>
 						<User size={18} />
 						{!isCollapsed && <span>Profile</span>}
-					</div>
+					</Link>
+					<Link
+						className={styles["navItem"]}
+						style={{ cursor: "pointer" }}
+						href={"/pricing"}
+					>
+						<DollarSign size={18} />
+						{!isCollapsed && <span>Subscription</span>}
+					</Link>
 
 					{user ? (
 						<div

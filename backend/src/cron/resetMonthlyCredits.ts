@@ -56,7 +56,7 @@ export async function resetMonthlyCredits() {
 							user_id: user.user_id, // ✅ Ensure user_id is correct
 							monthly_credits: newMonthlyCredits, // ✅ Ensure this is being updated
 							month: today.toISOString().slice(0, 7) + "-01",
-                            used_credits: 0
+							used_credits: 0,
 						},
 					],
 					{ onConflict: "user_id, month" }
