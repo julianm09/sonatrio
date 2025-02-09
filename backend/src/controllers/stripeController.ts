@@ -9,6 +9,8 @@ export const createSubscription = async (
 	try {
 		const { priceId, customerEmail, userId } = req.body;
 
+		console.log(userId);
+
 		// Check if customer already exists
 		const existingCustomers = await stripe.customers.list({
 			email: customerEmail,
@@ -21,13 +23,13 @@ export const createSubscription = async (
 				: await stripe.customers.create({ email: customerEmail }); // Create new customer if not found
 
 		// Store stripe_customer_id in Supabase
-		const { error } = await supabase
+		const user = await supabase
 			.from("users") // Assuming you have a 'users' table
 			.update({ stripe_customer_id: customer.id })
 			.eq("user_id", userId);
 
-		if (error) {
-			console.error("Error storing stripe_customer_id:", error.message);
+		if (!user) {
+			console.error("Error storing stripe_customer_id:");
 			res.status(500).json({ error: "Failed to update user record" });
 			return;
 		}
@@ -118,4 +120,100 @@ export const updateBilling = async (
 		console.error("Error creating Billing Portal session:", err);
 		err instanceof Error && res.status(500).json({ error: err.message });
 	}
+};
+
+export const cancelSubscription = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	const userId = req.body.userId;
+	if (!userId) {
+		console.error("No user ID provided. Cannot proceed.");
+		return;
+	}
+
+	// Get the customer ID associated with the user
+	const { data: userData, error: userError } = await supabase
+		.from("users")
+		.select("stripe_customer_id")
+		.eq("user_id", userId)
+		.single();
+
+	if (userError || !userData) {
+		console.error(
+			"Failed to get customer ID:",
+			userError?.message || "User not found."
+		);
+		return;
+	}
+
+	const { stripe_customer_id: customer } = userData;
+
+	if (!customer) {
+		console.error("No Stripe customer ID found for the user.");
+		return;
+	}
+
+	// Cancel the subscription in Stripe
+	try {
+		const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+		const subscriptions = await stripe.subscriptions.list({ customer });
+
+		for (const subscription of subscriptions.data) {
+			await stripe.subscriptions.cancel(subscription.id);
+		}
+	} catch (error: any) {
+		console.error(
+			"Failed to cancel subscription in Stripe:",
+			error.message
+		);
+		return;
+	}
+
+	// Delete the subscription record
+	const { error: subscriptionsError } = await supabase
+		.from("subscriptions")
+		.delete()
+		.eq("stripe_customer_id", customer);
+
+	if (subscriptionsError) {
+		console.error(
+			"Failed to delete subscription in Supabase:",
+			subscriptionsError.message
+		);
+		return;
+	}
+
+	// Reset transcription credits for the user
+	const { error: creditsError } = await supabase
+		.from("transcription_credits")
+		.update({
+			month: new Date().toISOString(),
+			monthly_credits: 30,
+			used_credits: 0,
+		})
+		.eq("user_id", userId);
+
+	if (creditsError) {
+		console.error(
+			"Failed to update credits in Supabase:",
+			creditsError.message
+		);
+		return;
+	}
+
+	// Update user tier to "free"
+	const { error: tierError } = await supabase
+		.from("users")
+		.update({ tier: "free" })
+		.eq("user_id", userId);
+
+	if (tierError) {
+		console.error("Failed to update user tier:", tierError.message);
+		return;
+	}
+
+	res.status(200).json({
+		message: `Subscription for user ${userId} canceled in Stripe, deleted in Supabase, credits reset, and tier updated to "free".`,
+	});
 };

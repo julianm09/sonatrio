@@ -1,0 +1,73 @@
+$primary-color: #ac93ff;
+$button-color: #5f4ba2;
+$secondary-color: #f8f9fa;
+$hover-color: #6c3fff;
+$border-radius: 12px;
+$transition-speed: 0.3s;
+
+.pricingContainer {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 20px;
+	padding: 40px;
+}
+
+.card {
+	background: #222;
+	border: 1px solid #636363;
+	border-radius: $border-radius;
+	padding: 20px;
+	width: 260px;
+	text-align: center;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	transition: transform $transition-speed ease-in-out,
+		box-shadow $transition-speed ease-in-out;
+
+
+}
+
+.title {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 10px;
+}
+
+.price {
+	font-size: 24px;
+	color: $primary-color;
+	font-weight: bold;
+	margin-bottom: 15px;
+}
+
+.features {
+	list-style: none;
+	padding: 0;
+	margin-bottom: 15px;
+
+	li {
+		font-size: 16px;
+		padding: 5px 0;
+		color: #f3f3f3;
+	}
+}
+
+.button {
+	background: $button-color;
+	color: #f3f3f3;
+	border: none;
+	padding: 10px 15px;
+	font-size: 15px;
+	border-radius: $border-radius;
+	cursor: pointer;
+	transition: background $transition-speed ease-in-out;
+
+	&:hover {
+		background: $hover-color;
+	}
+
+	&.disabled {
+		background: #333;
+		cursor: auto;
+	}
+}

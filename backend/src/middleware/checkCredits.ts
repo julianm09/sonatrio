@@ -33,16 +33,11 @@ const checkCredits = async (
 			return;
 		}
 
-		// ✅ Get the current month for filtering
-		const today = new Date();
-		const monthStart = today.toISOString().slice(0, 7) + "-01";
-
 		// ✅ Fetch user credits
 		const { data, error } = await supabase
 			.from("transcription_credits")
 			.select("monthly_credits, used_credits")
 			.eq("user_id", user)
-			.eq("month", monthStart)
 			.single();
 
 		if (error || !data) {

@@ -64,29 +64,96 @@ export const handleStripeWebhook = async (
 	res.sendStatus(200);
 };
 
-// Function to update Supabase subscriptions table
-const updateSubscription = async (subscription: any) => {
-	const { id, customer, items, status } = subscription;
-	const priceId = items.data[0]?.price.id || null;
+// Update Subscription
+const updateSubscription = async (subscriptions: any) => {
+	try {
+		const { id, customer, items, status } = subscriptions;
+		const priceId = items?.data?.[0]?.price?.id || null;
 
-	const { error } = await supabase
-		.from("subscriptions")
-		.update({
-			stripe_customer_id: customer,
-			stripe_subscription_id: id,
-			price_id: priceId,
-			status: status,
-			updated_at: new Date().toISOString(),
-		})
-		.eq("stripe_customer_id", customer);
+		if (!customer) {
+			throw new Error("Customer ID is missing.");
+		}
 
-	if (error) {
-		console.error(
-			"Failed to update subscription in Supabase:",
-			error.message
-		);
-	} else {
-		console.log(`Subscription ${id} updated successfully.`);
+		// Fetch user's user_id and subscription tier in parallel
+		const [
+			{ data: userData, error: userError },
+			{ data: priceData, error: priceError },
+		] = await Promise.all([
+			supabase
+				.from("users")
+				.select("user_id")
+				.eq("stripe_customer_id", customer)
+				.single(),
+			supabase
+				.from("pricing")
+				.select("tier, transcription_credits")
+				.eq("price_id", priceId)
+				.single(),
+		]);
+
+		if (userError)
+			throw new Error("Failed to fetch user data: " + userError.message);
+		if (priceError)
+			throw new Error(
+				"Failed to fetch pricing data: " + priceError.message
+			);
+
+		const { user_id } = userData || {};
+		const { tier, transcription_credits } = priceData || {};
+
+		// Perform both updates in parallel
+		const [{ error: subscriptionError }, { error: userUpdateError }] =
+			await Promise.all([
+				// Update subscription
+				supabase
+					.from("subscriptions")
+					.update({
+						stripe_customer_id: customer,
+						stripe_subscription_id: id,
+						price_id: priceId,
+						status: status,
+						updated_at: new Date().toISOString(),
+					})
+					.eq("stripe_customer_id", customer),
+
+				// Update user tier and reset credits
+				supabase
+					.from("users")
+					.update({
+						tier: tier,
+						subscription_start_date: new Date().toISOString(),
+					})
+					.eq("stripe_customer_id", customer),
+			]);
+
+		if (subscriptionError)
+			throw new Error(
+				"Failed to update subscription: " + subscriptionError.message
+			);
+		if (userUpdateError)
+			throw new Error(
+				"Failed to update user data: " + userUpdateError.message
+			);
+
+		// Reset transcription credits
+		const { error: creditsError } = await supabase
+			.from("transcription_credits")
+			.update({
+				month: new Date().toISOString(),
+				monthly_credits: transcription_credits,
+				used_credits: 0,
+			})
+			.eq("user_id", user_id);
+
+		if (creditsError)
+			throw new Error(
+				"Failed to update transcription credits: " +
+					creditsError.message
+			);
+
+		console.log("Subscription update successful!");
+	} catch (error) {
+		if (error instanceof Error) console.error(error.message);
 	}
 };
 
@@ -94,16 +161,72 @@ const updateSubscription = async (subscription: any) => {
 const deleteSubscription = async (subscription: any) => {
 	const { customer } = subscription;
 
+	if (!customer) {
+		console.error("No customer ID provided. Cannot proceed.");
+		return;
+	}
+
 	// Delete the subscription record
-	const { error } = await supabase
+	const { error: subscriptionsError } = await supabase
 		.from("subscriptions")
 		.delete()
 		.eq("stripe_customer_id", customer);
 
-	if (error) {
-		console.error("Failed to delete subscription in Supabase:", error.message);
-	} else {
-		console.log(`Subscription for customer ${customer} deleted successfully.`);
+	if (subscriptionsError) {
+		console.error(
+			"Failed to delete subscription in Supabase:",
+			subscriptionsError.message
+		);
+		return;
 	}
-};
 
+	// Get User ID associated with the subscription
+	const { data: userData, error: userError } = await supabase
+		.from("users")
+		.select("user_id")
+		.eq("stripe_customer_id", customer)
+		.single();
+
+	if (userError || !userData) {
+		console.error(
+			"Failed to get user_id:",
+			userError?.message || "User not found."
+		);
+		return;
+	}
+
+	const { user_id } = userData;
+
+	// Reset transcription credits for the user
+	const { error: creditsError } = await supabase
+		.from("transcription_credits")
+		.update({
+			month: new Date().toISOString(),
+			monthly_credits: 30,
+			used_credits: 0,
+		})
+		.eq("user_id", user_id);
+
+	if (creditsError) {
+		console.error(
+			"Failed to update credits in Supabase:",
+			creditsError.message
+		);
+		return;
+	}
+
+	// Update user tier to "free"
+	const { error: tierError } = await supabase
+		.from("users")
+		.update({ tier: "free" })
+		.eq("user_id", user_id);
+
+	if (tierError) {
+		console.error("Failed to update user tier:", tierError.message);
+		return;
+	}
+
+	console.log(
+		`Subscription for customer ${customer} deleted, credits reset, and user ${user_id} tier updated to "free".`
+	);
+};

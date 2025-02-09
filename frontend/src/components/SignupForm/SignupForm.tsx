@@ -89,6 +89,24 @@ const SignupForm: React.FC = () => {
 				);
 			}
 
+			// Create profile in the profiles table
+			const { error: creditsError } = await supabase
+				.from("transcription_credits") // Replace with your table name
+				.insert([
+					{
+						user_id: user.id, // User ID from Supabase
+						month: new Date().toISOString(),
+						monthly_credits: 30,
+						used_credits: 0,
+					},
+				]);
+
+			if (creditsError) {
+				throw new Error(
+					`Credits creation failed: ${creditsError.message}`
+				);
+			}
+
 			// Success message
 			setSuccessMessage("Account created! Check your email to confirm.");
 			setError(null);

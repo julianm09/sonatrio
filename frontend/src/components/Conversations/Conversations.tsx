@@ -22,6 +22,8 @@ const Conversations: React.FC<ConversationsProps> = ({
 }) => {
 	const [conversations, setConversations] = useState<Conversation[]>([]);
 	const { currentConversation, setCurrentConversation } = useMessageContext();
+	const [error, setError] = useState<string | null>(null);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const loadConversations = async () => {
@@ -30,9 +32,11 @@ const Conversations: React.FC<ConversationsProps> = ({
 				setConversations(data);
 			} catch (err) {
 				if (err instanceof Error) {
-					console.log(err.message);
+					setError("Can't find sessions");
 				}
 			}
+
+			setLoading(false);
 		};
 
 		loadConversations();
@@ -74,22 +78,37 @@ const Conversations: React.FC<ConversationsProps> = ({
 		>
 			<>
 				<div className={styles["label"]}>Session</div>
-				<div className={styles["conversation-container"]}>
-					{conversations.map((conversation) => (
-						<div
-							key={conversation.id}
-							className={`${styles["conversation"]} ${
-								currentConversation === conversation.id &&
-								styles["active"]
-							}`}
-							onClick={() =>
-								handleCurrentConversation(conversation.id)
-							}
-						>
-							<p>{conversation.name}</p>
-						</div>
-					))}
-				</div>
+
+				{conversations?.length > 0 && (
+					<div className={styles["conversation-container"]}>
+						{conversations?.map((conversation) => (
+							<div
+								key={conversation.id}
+								className={`${styles["conversation"]} ${
+									currentConversation === conversation.id &&
+									styles["active"]
+								}`}
+								onClick={() =>
+									handleCurrentConversation(conversation.id)
+								}
+							>
+								<p>{conversation.name}</p>
+							</div>
+						))}
+					</div>
+				)}
+
+				{loading && (
+					<div className={styles["conversation-container"]}>
+						<div className={styles["loading"]}>Loading...</div>
+					</div>
+				)}
+
+				{error && (
+					<div className={styles["conversation-container"]}>
+						<div className={styles["error"]}>{error}</div>
+					</div>
+				)}
 			</>
 		</div>
 	);

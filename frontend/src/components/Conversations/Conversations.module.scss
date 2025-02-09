@@ -11,7 +11,7 @@
 .label {
 	margin-bottom: 10px;
 	padding: 0 16px;
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 700;
 }
 
@@ -32,6 +32,7 @@
 		white-space: nowrap;
 		width: 150px;
 		margin: 0;
+		font-size: 15px;
 	}
 
 	&.active {
@@ -42,4 +43,15 @@
 		background-color: #444;
 		cursor: pointer;
 	}
+}
+
+.loading {
+	padding: 16px;
+	font-size: 15px;
+}
+
+.error {
+	padding: 16px;
+	font-size: 15px;
+	color: #FFBB00;
 }

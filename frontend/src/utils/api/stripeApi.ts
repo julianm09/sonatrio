@@ -1,7 +1,11 @@
 import axios from "axios";
 import { API_BASE_URL_LOCAL } from "./contentApi";
 
-export const createSubscription = async (priceId: string, email: string, userId: string) => {
+export const createSubscription = async (
+	priceId: string | undefined,
+	email: string | undefined,
+	userId: string
+) => {
 	try {
 		const res = await axios.post(
 			`${API_BASE_URL_LOCAL}/api/create-subscription`,
@@ -18,7 +22,7 @@ export const createSubscription = async (priceId: string, email: string, userId:
 	}
 };
 
-export const openBillingPortal = async (session_id: string) => {
+export const openBillingPortal = async (session_id: string | undefined) => {
 	try {
 		const res = await axios.post(
 			`${API_BASE_URL_LOCAL}/api/update-billing`,
@@ -33,3 +37,17 @@ export const openBillingPortal = async (session_id: string) => {
 	}
 };
 
+export const cancelSubscription = async (userId: string) => {
+	try {
+		const res = await axios.post(
+			`${API_BASE_URL_LOCAL}/api/cancel-subscription`,
+			{
+				userId,
+			}
+		);
+
+		return res.data;
+	} catch (error) {
+		console.error("Error creating subscription:", error);
+	}
+};

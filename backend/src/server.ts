@@ -6,8 +6,10 @@ import conversationsRoutes from "./routes/conversationsRoutes";
 import messagesRoutes from "./routes/messagesRoutes";
 import testRoutes from "./routes/test";
 import startCronJobs from "./cron/scheduler";
-import stripeRoutes from "./routes/stripeRoutes"
-import webhookRoutes from "./routes/webhookRoutes"
+import stripeRoutes from "./routes/stripeRoutes";
+import webhookRoutes from "./routes/webhookRoutes";
+import creditsRoutes from "./routes/creditsRoutes";
+import pricingRoutes from "./routes/pricingRoutes";
 
 dotenv.config();
 
@@ -36,6 +38,8 @@ app.use("/api", conversationsRoutes);
 app.use("/api", messagesRoutes);
 app.use("/test", testRoutes);
 app.use("/api", stripeRoutes);
+app.use("/api", creditsRoutes);
+app.use("/api", pricingRoutes);
 
 // ✅ Start cron jobs
 startCronJobs();
