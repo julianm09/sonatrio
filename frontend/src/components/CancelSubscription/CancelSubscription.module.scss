@@ -1,0 +1,20 @@
+$button-color: #5f4ba2;
+$secondary-color: #f8f9fa;
+$hover-color: #6c3fff;
+$border-radius: 12px;
+$transition-speed: 0.3s;
+
+.button {
+	background: $button-color;
+	color: #f3f3f3;
+	border: none;
+	padding: 10px 15px;
+	font-size: 15px;
+	border-radius: $border-radius;
+	cursor: pointer;
+	transition: background $transition-speed ease-in-out;
+
+	&:hover {
+		background: $hover-color;
+	}
+}

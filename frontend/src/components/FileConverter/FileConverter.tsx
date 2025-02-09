@@ -7,6 +7,7 @@ import { generateContent } from "@/utils/api/contentApi";
 import ContentSettings from "../ContentSettings/ContentSettings";
 import { useMessageContext } from "@/context/MessageContext";
 import { useUserContext } from "@/context/UserContext";
+import Credits from "../Credits/Credits";
 
 const FileConverter: React.FC = ({}) => {
 	const [file, setFile] = useState<File | null>(null);
@@ -118,6 +119,8 @@ const FileConverter: React.FC = ({}) => {
 				selectedFormats={selectedFormats}
 				setSelectedFormats={setSelectedFormats}
 			/>
+
+			<Credits userId={user?.id}/>
 		</div>
 	);
 };

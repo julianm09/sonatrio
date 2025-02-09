@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { supabase } from "../utils/supabase";
 
-export const getUserConversations = async (
+export const getCredits = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
@@ -15,10 +15,9 @@ export const getUserConversations = async (
 
 		// Fetch conversations for the user
 		const { data, error } = await supabase
-			.from("conversations")
-			.select("*")
+			.from("transcription_credits")
+			.select("monthly_credits, used_credits")
 			.eq("user_id", user_id)
-			.order("created_at", { ascending: false });
 
 		if (error) {
 			throw new Error(error.message);

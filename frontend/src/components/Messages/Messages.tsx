@@ -123,7 +123,7 @@ const Messages: React.FC<MessagesProps> = ({ conversationId }) => {
 
 	return (
 		<div className={styles["message-container"]}>
-			{messages.map((message) => (
+			{messages?.map((message) => (
 				<div key={message.id} className={styles["message"]}>
 					<LabelHeader
 						label={`${formatTitleCase(message.format)} - ${
