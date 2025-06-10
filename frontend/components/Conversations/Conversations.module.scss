@@ -1,0 +1,57 @@
+.container {
+	margin-top: 40px;
+	position: relative;
+	width: 100%;
+
+	&.hidden {
+		display: none;
+	}
+}
+
+.label {
+	margin-bottom: 10px;
+	padding: 0 16px;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.conversation-container {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.conversation {
+	padding: 16px;
+	border-bottom: 1px solid #333;
+	width: 100%;
+
+	p {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 150px;
+		margin: 0;
+		font-size: 15px;
+	}
+
+	&.active {
+		background: #555;
+	}
+
+	&:hover {
+		background-color: #444;
+		cursor: pointer;
+	}
+}
+
+.loading {
+	padding: 16px;
+	font-size: 15px;
+}
+
+.error {
+	padding: 16px;
+	font-size: 15px;
+	color: #FFBB00;
+}

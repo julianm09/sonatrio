@@ -1,0 +1,22 @@
+.convert-button {
+    width: 100%;
+    padding: 15px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 0;
+    border-radius: 5px;
+    outline: 1px solid rgba(243, 243, 243, 0.15);
+    background: linear-gradient(90deg, #361c85 0%, #5639ad 100%);
+    box-shadow: 0px 4px 20px rgba(243, 243, 243, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #f3f3f3;
+
+    &.inactive {
+        background: #545454;
+        cursor: auto;
+        box-shadow: none;
+    }
+}

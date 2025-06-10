@@ -1,0 +1,52 @@
+# === Node ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env
+.env.local
+.env.*.local
+
+# === Logs ===
+logs
+*.log
+*.log.*
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Build Output ===
+dist/
+build/
+.next/
+out/
+
+# === TypeScript ===
+*.tsbuildinfo
+
+# === Coverage ===
+coverage/
+*.lcov
+
+# === Vite / Parcel ===
+.vite/
+.cache/
+
+# === Misc ===
+.idea/
+.vscode/
+*.swp
+
+# === Supabase generated artifacts ===
+.supabase/
+functions/.netlify/
+functions/node_modules/
+
+# === Optional: Ignore frontend or backend specific files ===
+frontend/.env
+backend/.env
+
+# === Optional: If using submodules previously ===
+.gitmodules

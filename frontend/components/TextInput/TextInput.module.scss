@@ -1,0 +1,37 @@
+.input-container {
+    display: inline-flex;
+    flex-direction: column;
+    grid-gap: 5px;
+    position: relative;
+
+    label {
+        display: none;
+    }
+
+    input {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        padding: 15px;
+        font-size: 15px;
+        text-align: left;
+        background-color: #333;
+        border: 0;
+        border-radius: 5px;
+        outline: 1px solid #f3f3f370;
+        cursor: pointer;
+        appearance: none; /* Consolidated vendor prefixes */
+    }
+
+    .toggle-visibility-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: none;
+        border: none;
+        outline: 0;
+        cursor: pointer;
+        color: #f3f3f370;
+    }
+}

@@ -1,0 +1,19 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: flex-start;
+    position: relative;
+    min-height: 100vh;
+    max-height: 100vh;
+}
+
+.input-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    height: 200px;
+}

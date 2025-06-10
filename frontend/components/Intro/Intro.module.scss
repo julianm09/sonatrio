@@ -1,0 +1,32 @@
+.container {
+	background: #222;
+	padding: 40px;
+	border-radius: 20px;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+
+	.headline {
+        max-width: 600px;
+        border: none;
+        margin-bottom: 20px;
+        line-height: 1.5;
+		.highlight {
+            color:  #ac93ff;
+		}
+	}
+
+	.subheader {
+        line-height: 1.5;
+        max-width: 600px;
+        font-size: 18px;
+        margin-bottom: 40px;
+	}
+
+	.cta {
+		font-weight: 500;
+		font-size: 17px;
+        cursor: pointer;
+        color:  #ac93ff;
+	}
+}

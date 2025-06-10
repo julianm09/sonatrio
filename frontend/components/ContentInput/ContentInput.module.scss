@@ -1,0 +1,98 @@
+.container {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	background-color: #333;
+	align-items: center;
+	height: 140px;
+	background-color: #181818; /* Dark background */
+	padding: 20px;
+}
+
+.input-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	width: 800px;
+	gap: 20px;
+	
+	@media only screen and (max-width: 550px){
+		gap: 12px;
+	}
+
+	.file-input {
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 5px;
+		text-align: center;
+		font-size: 15px;
+		color: #f3f3f3;
+		cursor: pointer;
+		width: 100%;
+		overflow: hidden;
+		height: 40px;
+
+		p {
+			padding: 10px 20px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+
+			@media only screen and (max-width: 550px){
+				display: none
+			}
+		}
+
+		.icon {
+			display: none;
+
+			@media only screen and (max-width: 550px){
+				display: flex;
+			}
+		}
+	}
+
+	.settings{
+		display: flex;
+		cursor: pointer;
+	}
+}
+
+.format-container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 20px;
+}
+
+.action-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+}
+
+.loader {
+	width: 14px;
+	height: 14px;
+	border: 2px solid #ac93ff;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
